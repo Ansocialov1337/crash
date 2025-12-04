@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡️ CRASH X</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* --- Общие Стили --- */
+        :root {
+            --black: #0d0d0d;
+            --main-text: #f0f0f0;
+            --accent-color: #00e0ff;
+            --warning-color: #ff3366;
+            --success-color: #00ff88;
+            --card-bg: #1a1a1a;
+            --secondary-bg: #2a2a2a;
+            --hover-bg: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a2e 100%);
+            color: var(--main-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- Анимации --- */
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 224, 255, 0.15); }
+            50% { box-shadow: 0 4px 30px rgba(0, 224, 255, 0.4); }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px currentColor; }
+            50% { text-shadow: 0 0 40px currentColor; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Анимация бега БЕЗ scaleX */
+        @keyframes run {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Анимация спотыкания БЕЗ scaleX */
+        @keyframes stumble {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-15deg); }
+            50% { transform: rotate(15deg); }
+            75% { transform: rotate(-10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* --- Шапка --- */
+        header {
+            width: 100%;
+            max-width: 900px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 224, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-color), #00ff88, var(--accent-color));
+            animation: float 3s infinite;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--accent-color), #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1;
+        }
+
+        .balance-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+            z-index: 1;
+        }
+
+        .balance-main {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .balance-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .deposit-btn {
+            background: linear-gradient(135deg, #00ff88, #00e0ff);
+            color: var(--black);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            margin-top: 5px;
+            transition: all 0.3s;
+        }
+
+        .deposit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        /* --- Модальное окно --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 224, 255, 0.3);
+            border: 2px solid var(--accent-color);
+            animation: slideIn 0.3s;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--accent-color), #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--secondary-bg);
+            color: var(--main-text);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid #333;
+            background-color: var(--secondary-bg);
+            color: var(--main-text);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .form-input::placeholder {
+            color: #666;
+        }
+
+        .amount-presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .amount-preset-btn {
+            padding: 10px;
+            background: var(--secondary-bg);
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .amount-preset-btn:hover {
+            background: var(--hover-bg);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), #00bfff);
+            color: var(--black);
+            box-shadow: 0 4px 15px rgba(0, 224, 255, 0.3);
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 224, 255, 0.5);
+        }
+
+        .modal-btn-secondary {
+            background: var(--secondary-bg);
+            color: var(--main-text);
+            border: 2px solid #333;
+        }
+
+        .modal-btn-secondary:hover {
+            background: var(--hover-bg);
+            border-color: #555;
+        }
+
+        .card-icons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 25px;
+            background: var(--secondary-bg);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #888;
+            border: 1px solid #333;
+        }
+
+        .processing {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #333;
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            color: var(--warning-color);
+        }
+
+        /* --- Основной Контейнер --- */
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr 250px;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* --- Игровая Область --- */
+        .game-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .game-area {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 224, 255, 0.15);
+            overflow: hidden;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .game-area.active {
+            border-color: var(--accent-color);
+            animation: pulse 2s infinite;
+        }
+
+        /* Дорога */
+        .road {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-top: 3px dashed #555;
+            z-index: 0;
+        }
+
+        /* Бегун - контейнер без transform */
+        .runner-container {
+            position: absolute;
+            bottom: 80px;
+            left: 50px;
+            width: 60px;
+            height: 80px;
+            z-index: 5;
+            transition: left 0.05s linear;
+        }
+
+        /* Анимация применяется к контейнеру */
+        .runner-container.running {
+            animation: run 0.3s infinite;
+        }
+
+        .runner-container.stumbled {
+            animation: stumble 0.5s;
+        }
+
+        /* Бегун всегда отражен зеркально */
+        .runner {
+            width: 100%;
+            height: 100%;
+            font-size: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scaleX(-1); /* ЗЕРКАЛЬНОЕ ОТРАЖЕНИЕ ВСЕГДА */
+        }
+
+        /* Множитель */
+        .multiplier-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px currentColor;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+
+        .multiplier-display.active { 
+            color: var(--accent-color);
+            animation: glow 1s infinite;
+        }
+
+        .multiplier-display.crashed { 
+            color: var(--warning-color);
+            animation: shake 0.5s;
+        }
+
+        .multiplier-display.cashed-out { 
+            color: var(--success-color);
+            animation: bounce 0.5s;
+        }
+
+        /* Статус и таймер */
+        #statusText {
+            position: absolute;
+            bottom: 100px;
+            z-index: 10;
+            font-size: 1.1rem;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .countdown-timer {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--warning-color);
+            text-shadow: 0 0 20px var(--warning-color);
+            z-index: 10;
+            display: none;
+        }
+
+        .countdown-timer.show {
+            display: block;
+            animation: bounce 0.5s infinite;
+        }
+
+        /* --- Панель Управления --- */
+        .controls {
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        input {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid #333;
+            background-color: var(--secondary-bg);
+            color: var(--main-text);
+            width: 120px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            padding: 14px 28px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            flex-grow: 1;
+            max-width: 200px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--accent-color), #00bfff);
+            color: var(--black);
+            box-shadow: 0 4px 15px rgba(0, 224, 255, 0.3);
+        }
+
+        .btn-start:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 224, 255, 0.5);
+        }
+
+        .btn-start:disabled { 
+            background: #555;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, var(--warning-color), #ff6b6b);
+            color: white;
+            display: none;
+            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);
+        }
+
+        .btn-stop:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 51, 102, 0.5);
+        }
+
+        .bet-presets {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .preset-btn {
+            padding: 8px 12px;
+            background: var(--secondary-bg);
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            background: var(--hover-bg);
+            color: var(--accent-color);
+        }
+
+        /* --- Боковая Панель --- */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 { 
+            margin: 0 0 15px 0;
+            color: var(--accent-color);
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #222;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .list-item:hover {
+            background: rgba(0, 224, 255, 0.05);
+        }
+
+        .list-item:last-child { 
+            border-bottom: none;
+        }
+
+        .list-item .name {
+            color: #ccc;
+        }
+
+        .list-item .value {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: var(--secondary-bg);
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* История игр */
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-multiplier {
+            font-weight: bold;
+        }
+
+        .history-multiplier.win {
+            color: var(--success-color);
+        }
+
+        .history-multiplier.loss {
+            color: var(--warning-color);
+        }
+
+        /* --- Уведомления --- */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--card-bg);
+            color: var(--main-text);
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .notification.success {
+            border-left-color: var(--success-color);
+        }
+
+        .notification.error {
+            border-left-color: var(--warning-color);
+        }
+
+        .notification.info {
+            border-left-color: var(--accent-color);
+        }
+
+        /* --- Адаптивность --- */
+        @media (max-width: 480px) {
+            .multiplier-display {
+                font-size: 3.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            button {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            input {
+                width: 100%;
+            }
+
+            .modal {
+                padding: 20px;
+            }
+
+            .runner-container {
+                width: 40px;
+                height: 60px;
+            }
+
+            .runner {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>
+            <span>⚡️</span>
+            CRASH X
+        </h1>
+        <div class="balance-box">
+            <div class="balance-main"><span id="balance">1000</span> ₽</div>
+            <div class="balance-label">Ваш баланс</div>
+            <button class="deposit-btn" id="depositBtn" onclick="openDepositModal()">
+                💳 Пополнить
+            </button>
+        </div>
+    </header>
+
+    <!-- Модальное окно пополнения -->
+    <div class="modal-overlay" id="depositModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">💳 Пополнение баланса</div>
+                <button class="modal-close" onclick="closeDepositModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Содержимое генерируется динамически -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeDepositModal()">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="processDeposit()">Пополнить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="game-column">
+            <div class="game-area" id="gameArea">
+                <div class="multiplier-display active" id="multiplier">1.00x</div>
+                <div id="statusText">Сделайте ставку</div>
+                <div class="countdown-timer" id="countdownTimer">5</div>
+                
+                <!-- Дорога -->
+                <div class="road"></div>
+                
+                <!-- Бегун -->
+                <div class="runner-container" id="runnerContainer">
+                    <div class="runner">🏃</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="input-group">
+                    <label class="input-label">Ставка</label>
+                    <input type="number" id="betInput" value="10" min="1" placeholder="Ваша ставка">
+                    <div class="bet-presets">
+                        <button class="preset-btn" onclick="setBet(10)">+10</button>
+                        <button class="preset-btn" onclick="setBet(50)">+50</button>
+                        <button class="preset-btn" onclick="setBet('half')">1/2</button>
+                        <button class="preset-btn" onclick="setBet('max')">MAX</button>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Автовывод (x)</label>
+                    <input type="number" id="autoCashoutInput" value="2.0" min="1.01" step="0.01" placeholder="2.00">
+                </div>
+                
+                <button class="btn-start" id="btnStart" onclick="startGame()">
+                    🎲 Сделать ставку
+                </button>
+                
+                <button class="btn-stop" id="btnStop" onclick="cashOut()">
+                    💰 Забрать (0 ₽)
+                </button>
+            </div>
+
+            <!-- Статистика -->
+            <div class="card">
+                <h3>📊 Статистика</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalGames">0</div>
+                        <div class="stat-label">Игр</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalWins">0</div>
+                        <div class="stat-label">Побед</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="maxWin">0</div>
+                        <div class="stat-label">Макс. выигрыш</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="winRate">0%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <!-- Лидеры -->
+            <div class="card">
+                <h3>🏆 Топ игроков</h3>
+                <div id="leaderboardList">
+                    <div class="list-item">
+                        <span class="name">🥇 NeoHunter</span>
+                        <span class="value">8000 ₽</span>
+                    </div>
+                    <div class="list-item">
+                        <span class="name">🥈 CrashGuru</span>
+                        <span class="value">6500 ₽</span>
+                    </div>
+                    <div class="list-item">
+                        <span class="name">🥉 Astra_X</span>
+                        <span class="value">3200 ₽</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- История -->
+            <div class="card">
+                <h3>📜 История</h3>
+                <div id="historyList">
+                    <div style="text-align: center; color: #666; padding: 20px;">
+                        Нет игр
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        /* --- TELEGRAM WEB APP --- */
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        /* --- ПЕРЕМЕННЫЕ ИГРЫ --- */
+        let balance = 0;
+        let currentMultiplier = 1.00;
+        let isGameRunning = false;
+        let gameInterval;
+        let crashPoint = 0;
+        let currentBet = 0;
+        let gameTime = 0;
+        let userCashedOut = false;
+        let isCountingDown = false;
+        let countdownInterval;
+        let countdownValue = 5;
+        let userPlacedBet = false;
+
+        // Статистика
+        let stats = {
+            totalGames: 0,
+            totalWins: 0,
+            maxWin: 0,
+            history: [],
+            totalBet: 0,
+            totalWin: 0
+        };
+
+        /* --- ЭЛЕМЕНТЫ --- */
+        const elBalance = document.getElementById('balance');
+        const elMultiplier = document.getElementById('multiplier');
+        const elStatus = document.getElementById('statusText');
+        const elBtnStart = document.getElementById('btnStart');
+        const elBtnStop = document.getElementById('btnStop');
+        const elBetInput = document.getElementById('betInput');
+        const elGameArea = document.getElementById('gameArea');
+        const elNotification = document.getElementById('notification');
+        const elDepositModal = document.getElementById('depositModal');
+        const elRunnerContainer = document.getElementById('runnerContainer');
+        const elModalBody = document.getElementById('modalBody');
+        const elAutoCashoutInput = document.getElementById('autoCashoutInput');
+        const elCountdownTimer = document.getElementById('countdownTimer');
+
+        /* --- ИНИЦИАЛИЗАЦИЯ --- */
+        function initBalance() {
+            const savedDate = localStorage.getItem('lastLoginDate');
+            const savedBalance = localStorage.getItem('userBalance');
+            const savedStats = localStorage.getItem('gameStats');
+            const today = new Date().toDateString();
+
+            if (savedDate !== today || !savedBalance) {
+                balance = 1000;
+                localStorage.setItem('lastLoginDate', today);
+            } else {
+                balance = parseInt(savedBalance);
+            }
+
+            if (savedStats) {
+                stats = JSON.parse(savedStats);
+            }
+
+            updateBalanceUI();
+            updateStatsUI();
+            updateHistoryUI();
+        }
+
+        function updateBalanceUI() {
+            elBalance.innerText = Math.floor(balance);
+            localStorage.setItem('userBalance', balance);
+        }
+
+        function updateStatsUI() {
+            document.getElementById('totalGames').innerText = stats.totalGames;
+            document.getElementById('totalWins').innerText = stats.totalWins;
+            document.getElementById('maxWin').innerText = stats.maxWin;
+            
+            const winRate = stats.totalGames > 0 
+                ? ((stats.totalWins / stats.totalGames) * 100).toFixed(1)
+                : 0;
+            document.getElementById('winRate').innerText = winRate + '%';
+            
+            localStorage.setItem('gameStats', JSON.stringify(stats));
+        }
+
+        function updateHistoryUI() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            if (stats.history.length === 0) {
+                historyList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Нет игр</div>';
+                return;
+            }
+
+            stats.history.slice(0, 5).forEach(game => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                
+                const isWin = game.result > 0;
+                const multiplierClass = isWin ? 'win' : 'loss';
+                const resultText = isWin ? `+${game.result}` : game.result;
+                
+                item.innerHTML = `
+                    <span class="history-multiplier ${multiplierClass}">${game.multiplier}x</span>
+                    <span class="${multiplierClass}">${resultText} ₽</span>
+                `;
+                
+                historyList.appendChild(item);
+            });
+        }
+
+        /* --- ГЕНЕРАЦИЯ ФОРМЫ ПОПОЛНЕНИЯ --- */
+        function getDepositModalBodyHtml() {
+            return `
+                <div class="form-group">
+                    <label class="form-label">Номер карты</label>
+                    <input type="text" class="form-input" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                    <div class="card-icons">
+                        <div class="card-icon">VISA</div>
+                        <div class="card-icon">MC</div>
+                        <div class="card-icon">MIR</div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label class="form-label">Срок действия</label>
+                        <input type="text" class="form-input" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CVV</label>
+                        <input type="text" class="form-input" id="cardCvv" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Сумма пополнения (₽)</label>
+                    <input type="number" class="form-input" id="depositAmount" placeholder="Введите сумму" min="100" max="100000">
+                    <div class="amount-presets">
+                        <button class="amount-preset-btn" onclick="setDepositAmount(1000)">1000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(5000)">5000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(10000)">10000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(25000)">25000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(50000)">50000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(100000)">100000</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Промокод (необязательно)</label>
+                    <input type="text" class="form-input" id="promoCodeInput" placeholder="Введите промокод" value="">
+                </div>
+            `;
+        }
+
+        /* --- МОДАЛЬНОЕ ОКНО ПОПОЛНЕНИЯ --- */
+        function openDepositModal() {
+            elDepositModal.classList.add('show');
+            elModalBody.innerHTML = getDepositModalBodyHtml();
+            playSound('start');
+        }
+
+        function closeDepositModal() {
+            elDepositModal.classList.remove('show');
+        }
+
+        function setDepositAmount(amount) {
+            document.getElementById('depositAmount').value = amount;
+        }
+
+        function processDeposit() {
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCvv = document.getElementById('cardCvv').value;
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            const promoCode = document.getElementById('promoCodeInput').value;
+
+            if (!cardNumber || cardNumber.length < 13) {
+                showNotification('❌ Введите корректный номер карты', 'error');
+                return;
+            }
+
+            if (!cardExpiry || cardExpiry.length < 4) {
+                showNotification('❌ Введите срок действия карты', 'error');
+                return;
+            }
+
+            if (!cardCvv || cardCvv.length < 3) {
+                showNotification('❌ Введите CVV код', 'error');
+                return;
+            }
+
+            if (!amount || amount < 100 || amount > 100000) {
+                showNotification('❌ Сумма должна быть от 100 до 100000 ₽', 'error');
+                return;
+            }
+
+            elModalBody.innerHTML = `
+                <div class="processing">
+                    <div class="spinner"></div>
+                    <div style="font-size: 1.1rem; color: var(--accent-color); font-weight: bold;">
+                        Обработка платежа...
+                    </div>
+                    <div style="margin-top: 10px; color: #888;">
+                        Пожалуйста, подождите
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                if (promoCode !== 'AnsocialovGift') {
+                    elModalBody.innerHTML = `
+                        <div class="processing">
+                            <div class="error-icon">❌</div>
+                            <div style="font-size: 1.3rem; color: var(--warning-color); font-weight: bold; margin-bottom: 10px;">
+                                Транзакция отменена
+                            </div>
+                            <div style="font-size: 1rem; color: #888; text-align: center;">
+                                Платеж не был обработан банком.<br>Попробуйте позже или используйте другую карту.
+                            </div>
+                        </div>
+                    `;
+
+                    playSound('crash');
+                    showNotification('❌ Транзакция отменена', 'error');
+
+                    setTimeout(() => {
+                        closeDepositModal();
+                    }, 3000);
+                } else {
+                    balance += amount;
+                    updateBalanceUI();
+
+                    elModalBody.innerHTML = `
+                        <div class="processing">
+                            <div class="success-icon">✅</div>
+                            <div style="font-size: 1.3rem; color: var(--success-color); font-weight: bold; margin-bottom: 10px;">
+                                Успешно!
+                            </div>
+                            <div style="font-size: 1.1rem; color: var(--main-text);">
+                                На ваш счет зачислено
+                            </div>
+                            <div style="font-size: 2rem; color: var(--accent-color); font-weight: bold; margin-top: 10px;">
+                                ${amount} ₽
+                            </div>
+                        </div>
+                    `;
+
+                    playSound('win');
+                    showNotification(`🎉 Баланс пополнен на ${amount} ₽!`, 'success');
+
+                    setTimeout(() => {
+                        closeDepositModal();
+                    }, 2000);
+                }
+            }, 2000);
+        }
+
+        /* --- ФУНКЦИИ СТАВОК --- */
+        function setBet(amount) {
+            if (amount === 'half') {
+                amount = Math.floor(balance / 2);
+            } else if (amount === 'max') {
+                amount = balance;
+            } else {
+                const current = parseInt(elBetInput.value) || 0;
+                amount = current + amount;
+            }
+            
+            if (amount > balance) amount = balance;
+            if (amount < 1) amount = 1;
+            
+            elBetInput.value = amount;
+        }
+
+        function showNotification(text, type = 'info') {
+            elNotification.className = `notification show ${type}`;
+            elNotification.textContent = text;
+            
+            setTimeout(() => {
+                elNotification.classList.remove('show');
+            }, 3000);
+        }
+
+        function playSound(type) {
+            if (tg.HapticFeedback) {
+                if (type === 'win') {
+                    tg.HapticFeedback.impactOccurred('heavy');
+                    tg.HapticFeedback.notificationOccurred('success');
+                } else if (type === 'crash') {
+                    tg.HapticFeedback.impactOccurred('heavy');
+                    tg.HapticFeedback.notificationOccurred('error');
+                } else if (type === 'start') {
+                    tg.HapticFeedback.impactOccurred('light');
+                }
+            }
+        }
+
+        /* --- ОБНОВЛЕНИЕ ПОЗИЦИИ БЕГУНА (МАКСИМУМ ДО СЕРЕДИНЫ) --- */
+        function updateRunnerPosition() {
+            const gameAreaWidth = elGameArea.offsetWidth;
+            
+            // Бегун движется с постоянной скоростью от 0 до 50% (середина)
+            const maxTime = 15000; // 15 секунд на полный пробег
+            const progress = Math.min(50, (gameTime / maxTime) * 50); // МАКСИМУМ 50%
+            
+            const runnerPosition = (progress / 100) * gameAreaWidth;
+            elRunnerContainer.style.left = runnerPosition + 'px';
+        }
+
+        /* --- ОБРАТНЫЙ ОТСЧЕТ --- */
+        function startCountdown() {
+            isCountingDown = true;
+            countdownValue = 5;
+            userPlacedBet = false;
+            elCountdownTimer.textContent = countdownValue;
+            elCountdownTimer.classList.add('show');
+            elStatus.innerText = "⏱ Сделайте ставку!";
+            
+            elBtnStart.disabled = false;
+            elBetInput.disabled = false;
+            
+            countdownInterval = setInterval(() => {
+                countdownValue--;
+                elCountdownTimer.textContent = countdownValue;
+                playSound('start');
+                
+                if (countdownValue <= 0) {
+                    clearInterval(countdownInterval);
+                    elCountdownTimer.classList.remove('show');
+                    isCountingDown = false;
+                    
+                    // Запускаем игру в любом случае
+                    startGameRound();
+                }
+            }, 1000);
+        }
+
+        /* --- ЗАПУСК РАУНДА (С СТАВКОЙ ИЛИ БЕЗ) --- */
+        function startGameRound() {
+            isGameRunning = true;
+            userCashedOut = false;
+            currentMultiplier = 1.00;
+            gameTime = 0;
+            
+            elMultiplier.innerText = "1.00x";
+            elMultiplier.className = 'multiplier-display active';
+            elGameArea.classList.add('active');
+            elRunnerContainer.classList.add('running');
+
+            elRunnerContainer.style.left = '50px';
+
+            if (userPlacedBet) {
+                elStatus.innerText = "🎮 В игре...";
+                elBtnStart.style.display = "none";
+                elBtnStop.style.display = "block";
+            } else {
+                elStatus.innerText = "👀 Наблюдаете...";
+                elBtnStart.style.display = "none";
+                elBtnStop.style.display = "none";
+            }
+
+            elBetInput.disabled = true;
+
+            // ГЕНЕРАЦИЯ КРАША - МОЖЕТ БЫТЬ В ЛЮБОЙ МОМЕНТ
+            const random = Math.random();
+            
+            if (random < 0.1) {
+                // 10% - очень ранний краш (1.01x - 1.50x)
+                crashPoint = 1.01 + Math.random() * 0.49;
+            } else if (random < 0.3) {
+                // 20% - ранний краш (1.50x - 2.50x)
+                crashPoint = 1.50 + Math.random() * 1.00;
+            } else if (random < 0.6) {
+                // 30% - средний краш (2.50x - 5.00x)
+                crashPoint = 2.50 + Math.random() * 2.50;
+            } else if (random < 0.85) {
+                // 25% - поздний краш (5.00x - 10.00x)
+                crashPoint = 5.00 + Math.random() * 5.00;
+            } else {
+                // 15% - очень поздний краш (10.00x - 100.00x)
+                crashPoint = 10.00 + Math.random() * 90.00;
+            }
+            
+            crashPoint = parseFloat(crashPoint.toFixed(2));
+
+            console.log("🎯 Crash Point:", crashPoint);
+
+            gameInterval = setInterval(gameLoop, 50);
+            playSound('start');
+        }
+
+        /* --- ЗАПУСК ИГРЫ (СТАВКА) --- */
+        function startGame() {
+            if (!isCountingDown) return;
+
+            currentBet = parseInt(elBetInput.value);
+
+            if (isNaN(currentBet) || currentBet <= 0 || currentBet > balance) {
+                showNotification("❌ Проверьте ставку и баланс!", 'error');
+                return;
+            }
+
+            balance -= currentBet;
+            stats.totalBet += currentBet;
+            updateBalanceUI();
+
+            userPlacedBet = true;
+
+            // Останавливаем отсчет и сразу запускаем игру
+            clearInterval(countdownInterval);
+            elCountdownTimer.classList.remove('show');
+            isCountingDown = false;
+            
+            startGameRound();
+        }
+
+        /* --- ИГРОВОЙ ЦИКЛ --- */
+        function gameLoop() {
+            gameTime += 50;
+            
+            // Множитель растет экспоненциально
+            const timeInSeconds = gameTime / 1000;
+            currentMultiplier = 1 + timeInSeconds * 0.15 + Math.pow(timeInSeconds, 1.5) * 0.08;
+            currentMultiplier = parseFloat(currentMultiplier.toFixed(2));
+
+            elMultiplier.innerText = currentMultiplier.toFixed(2) + "x";
+            
+            if (userPlacedBet && !userCashedOut) {
+                const potentialWin = Math.floor(currentBet * currentMultiplier);
+                elBtnStop.innerHTML = `💰 Забрать (${potentialWin} ₽)`;
+
+                // Автовывод
+                const autoTarget = parseFloat(elAutoCashoutInput.value) || 2.0;
+                if (currentMultiplier >= autoTarget) {
+                    cashOut();
+                    return;
+                }
+            }
+            
+            updateRunnerPosition();
+
+            // КРАШ ПРОИСХОДИТ КОГДА ДОСТИГНУТ МНОЖИТЕЛЬ
+            if (currentMultiplier >= crashPoint) {
+                crash();
+            }
+        }
+
+        /* --- КРАШ --- */
+        function crash() {
+            clearInterval(gameInterval);
+            isGameRunning = false;
+            
+            elMultiplier.innerText = crashPoint.toFixed(2) + "x";
+            elMultiplier.className = 'multiplier-display crashed';
+            elGameArea.classList.remove('active');
+            elRunnerContainer.classList.remove('running');
+            elRunnerContainer.classList.add('stumbled');
+
+            if (userPlacedBet && !userCashedOut) {
+                elStatus.innerText = `💥 КРАШ на ${crashPoint.toFixed(2)}x`;
+                
+                stats.totalGames++;
+                stats.history.unshift({
+                    multiplier: crashPoint.toFixed(2),
+                    result: -currentBet
+                });
+                if (stats.history.length > 10) stats.history.pop();
+                
+                updateStatsUI();
+                updateHistoryUI();
+                playSound('crash');
+            } else if (userPlacedBet && userCashedOut) {
+                elStatus.innerText = `✅ Вы забрали вовремя! Краш на ${crashPoint.toFixed(2)}x`;
+            } else {
+                elStatus.innerText = `💥 КРАШ на ${crashPoint.toFixed(2)}x`;
+            }
+
+            setTimeout(() => {
+                elRunnerContainer.classList.remove('stumbled');
+                resetGame();
+                startCountdown();
+            }, 2000);
+        }
+
+        /* --- ЗАБРАТЬ ВЫИГРЫШ --- */
+        function cashOut() {
+            if (!isGameRunning || userCashedOut || !userPlacedBet) return;
+
+            userCashedOut = true;
+
+            const winAmount = Math.floor(currentBet * currentMultiplier);
+            const profit = winAmount - currentBet;
+            
+            balance += winAmount;
+            stats.totalWin += profit;
+            
+            updateBalanceUI();
+
+            elMultiplier.className = 'multiplier-display cashed-out';
+            elStatus.innerText = `✅ Вы забрали: ${winAmount} ₽ (+${profit})`;
+            
+            elBtnStop.style.display = "none";
+
+            stats.totalGames++;
+            stats.totalWins++;
+            if (profit > stats.maxWin) stats.maxWin = profit;
+            
+            stats.history.unshift({
+                multiplier: currentMultiplier.toFixed(2),
+                result: profit
+            });
+            if (stats.history.length > 10) stats.history.pop();
+            
+            updateStatsUI();
+            updateHistoryUI();
+
+            playSound('win');
+            showNotification(`🎉 Выигрыш: +${profit} ₽`, 'success');
+        }
+
+        /* --- СБРОС ИГРЫ --- */
+        function resetGame() {
+            elBtnStop.style.display = "none";
+            elBtnStart.style.display = "block";
+            elBetInput.disabled = false;
+            
+            elMultiplier.innerText = "1.00x";
+            elMultiplier.className = 'multiplier-display active';
+            
+            elRunnerContainer.style.left = '50px';
+        }
+
+        /* --- ЗАПУСК --- */
+        initBalance();
+        startCountdown();
+        
+        if (tg.MainButton) {
+            tg.MainButton.text = "🎮 Играть";
+            tg.MainButton.show();
+            tg.MainButton.onClick(startGame);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && isCountingDown) {
+                startGame();
+            } else if (e.key === ' ' && isGameRunning && userPlacedBet) {
+                e.preventDefault();
+                cashOut();
+            }
+        });
+
+        // Форматирование ввода карты
+        document.addEventListener('input', function(e) {
+            if (e.target && e.target.id === 'cardNumber') {
+                let value = e.target.value.replace(/\s/g, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                e.target.value = formattedValue;
+            }
+
+            if (e.target && e.target.id === 'cardExpiry') {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                }
+                e.target.value = value;
+            }
+        });
+    </script>
+</body>
+</html>
