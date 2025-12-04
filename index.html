@@ -545,41 +545,47 @@
             animation: bounce 0.5s infinite;
         }
 
-        /* --- Панель Управления (КОМПАКТНАЯ) --- */
+        /* --- Панель Управления (МОБИЛЬНАЯ) --- */
         .controls {
-            padding: 15px;
+            padding: 12px;
             background: var(--card-bg);
             border-radius: 12px;
             display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls-row {
+            display: flex;
             gap: 8px;
             align-items: flex-end;
-            justify-content: center;
-            flex-wrap: wrap;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .input-group {
             display: flex;
             flex-direction: column;
             gap: 5px;
-            flex: 0 0 auto;
+            flex: 1;
         }
 
         .input-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #888;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         input {
-            padding: 10px 12px;
+            padding: 10px 8px;
             border-radius: 8px;
             border: 2px solid #333;
             background-color: var(--secondary-bg);
             color: var(--main-text);
-            width: 100px;
+            width: 100%;
             font-size: 0.95rem;
             transition: border-color 0.3s;
+            text-align: center;
         }
 
         input:focus {
@@ -588,23 +594,36 @@
         }
 
         button {
-            padding: 12px 20px;
+            padding: 12px 16px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: bold;
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
+        .btn-max {
+            background: var(--secondary-bg);
+            color: var(--accent-color);
+            border: 1px solid #333;
+            padding: 10px 12px;
+            font-size: 0.75rem;
+            min-width: 50px;
+        }
+
+        .btn-max:active {
+            background: var(--hover-bg);
+            border-color: var(--accent-color);
+        }
+
         .btn-start {
             background: linear-gradient(135deg, var(--accent-color), #00bfff);
             color: var(--black);
             box-shadow: 0 4px 15px rgba(0, 224, 255, 0.3);
-            flex: 1;
-            min-width: 140px;
+            width: 100%;
         }
 
         .btn-start:hover:not(:disabled) { 
@@ -624,36 +643,12 @@
             color: white;
             display: none;
             box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);
-            flex: 1;
-            min-width: 140px;
+            width: 100%;
         }
 
         .btn-stop:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 51, 102, 0.5);
-        }
-
-        .bet-presets {
-            display: flex;
-            gap: 4px;
-            margin-top: 5px;
-            flex-wrap: wrap;
-        }
-
-        .preset-btn {
-            padding: 6px 10px;
-            background: var(--secondary-bg);
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: all 0.2s;
-        }
-
-        .preset-btn:hover {
-            background: var(--hover-bg);
-            color: var(--accent-color);
         }
 
         /* --- Боковая Панель --- */
@@ -794,25 +789,58 @@
 
         /* --- Адаптивность --- */
         @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            header {
+                padding: 12px 15px;
+                margin-bottom: 15px;
+            }
+
+            header h1 {
+                font-size: 1.2rem;
+            }
+
+            .balance-main {
+                font-size: 1.1rem;
+            }
+
             .multiplier-display {
                 font-size: 3.5rem;
             }
 
+            .game-area {
+                height: 300px;
+            }
+
             .controls {
-                padding: 12px;
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .controls-row {
                 gap: 6px;
             }
 
             button {
-                min-width: 120px;
-                padding: 10px 16px;
+                padding: 11px 14px;
                 font-size: 0.85rem;
             }
 
+            .btn-max {
+                padding: 9px 10px;
+                font-size: 0.7rem;
+                min-width: 45px;
+            }
+
             input {
-                width: 90px;
-                padding: 8px 10px;
+                padding: 9px 6px;
                 font-size: 0.9rem;
+            }
+
+            .input-label {
+                font-size: 0.65rem;
             }
 
             .modal {
@@ -822,19 +850,77 @@
             .runner-container {
                 width: 40px;
                 height: 60px;
+                bottom: 60px;
             }
 
             .runner {
                 font-size: 3rem;
             }
 
-            .input-label {
-                font-size: 0.7rem;
+            .road {
+                height: 60px;
             }
 
-            .preset-btn {
-                padding: 5px 8px;
-                font-size: 0.7rem;
+            #statusText {
+                font-size: 0.95rem;
+                padding: 6px 12px;
+                bottom: 70px;
+            }
+
+            .countdown-timer {
+                font-size: 2.5rem;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .card h3 {
+                font-size: 1rem;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            header h1 {
+                font-size: 1.1rem;
+                gap: 5px;
+            }
+
+            .balance-main {
+                font-size: 1rem;
+            }
+
+            .deposit-btn {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+            }
+
+            .multiplier-display {
+                font-size: 3rem;
+            }
+
+            button {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+
+            .btn-max {
+                padding: 8px 8px;
+                font-size: 0.65rem;
+                min-width: 40px;
+            }
+
+            input {
+                padding: 8px 5px;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -889,24 +975,22 @@
             </div>
 
             <div class="controls">
-                <div class="input-group">
-                    <label class="input-label">Ставка</label>
-                    <input type="number" id="betInput" value="10" min="1" placeholder="Ставка">
-                    <div class="bet-presets">
-                        <button class="preset-btn" onclick="setBet(10)">+10</button>
-                        <button class="preset-btn" onclick="setBet(50)">+50</button>
-                        <button class="preset-btn" onclick="setBet('half')">1/2</button>
-                        <button class="preset-btn" onclick="setBet('max')">MAX</button>
+                <div class="controls-row">
+                    <div class="input-group">
+                        <label class="input-label">Ставка (₽)</label>
+                        <input type="number" id="betInput" value="10" min="1" placeholder="10">
+                    </div>
+                    
+                    <button class="btn-max" onclick="setBet('max')">MAX</button>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Автовывод (x)</label>
+                        <input type="number" id="autoCashoutInput" value="2.0" min="1.01" step="0.01" placeholder="2.0">
                     </div>
                 </div>
                 
-                <div class="input-group">
-                    <label class="input-label">Автовывод</label>
-                    <input type="number" id="autoCashoutInput" value="2.0" min="1.01" step="0.01" placeholder="2.00">
-                </div>
-                
                 <button class="btn-start" id="btnStart" onclick="startGame()">
-                    🎲 Ставка
+                    🎲 Сделать ставку
                 </button>
                 
                 <button class="btn-stop" id="btnStop" onclick="cashOut()">
@@ -1233,13 +1317,8 @@
 
         /* --- ФУНКЦИИ СТАВОК --- */
         function setBet(amount) {
-            if (amount === 'half') {
-                amount = Math.floor(balance / 2);
-            } else if (amount === 'max') {
+            if (amount === 'max') {
                 amount = balance;
-            } else {
-                const current = parseInt(elBetInput.value) || 0;
-                amount = current + amount;
             }
             
             if (amount > balance) amount = balance;
