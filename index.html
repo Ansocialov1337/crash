@@ -147,6 +147,13 @@
             background: linear-gradient(90deg, var(--accent-color), #00ff88, var(--accent-color));
         }
 
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1;
+        }
+
         header h1 {
             font-size: 1.8rem;
             background: linear-gradient(90deg, var(--accent-color), #00ff88);
@@ -156,7 +163,30 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            z-index: 1;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .user-info:hover {
+            color: var(--accent-color);
+        }
+
+        .username-display {
+            font-weight: 600;
+            color: var(--main-text);
+        }
+
+        .edit-icon {
+            font-size: 0.8rem;
+            opacity: 0.6;
         }
 
         .balance-box {
@@ -875,10 +905,17 @@
 <body>
 
     <header>
-        <h1>
-            <span>⚡️</span>
-            CRASH X
-        </h1>
+        <div class="header-left">
+            <h1>
+                <span>⚡️</span>
+                CRASH X
+            </h1>
+            <div class="user-info" onclick="openUsernameModal()">
+                <span>👤</span>
+                <span class="username-display" id="usernameDisplay">Игрок</span>
+                <span class="edit-icon">✏️</span>
+            </div>
+        </div>
         <div class="balance-box">
             <div class="balance-main"><span id="balance">1000</span> ₽</div>
             <div class="balance-label">Ваш баланс</div>
@@ -896,6 +933,29 @@
             </div>
         </div>
     </header>
+
+    <!-- МОДАЛКА СМЕНЫ ИМЕНИ -->
+    <div class="modal-overlay" id="usernameModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">👤 Изменить имя</div>
+                <button class="modal-close" onclick="closeUsernameModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Ваше имя в игре</label>
+                    <input type="text" class="form-input" id="usernameInput" placeholder="Введите имя" maxlength="20">
+                    <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">
+                        💡 Это имя будут видеть другие игроки
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeUsernameModal()">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="saveUsername()">Сохранить</button>
+            </div>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="depositModal">
         <div class="modal">
@@ -1007,8 +1067,32 @@
         tg.expand();
         tg.ready();
         
-        let playerName = tg.initDataUnsafe?.user?.first_name || 'Игрок' + Math.floor(Math.random() * 9999);
+        // 🎯 ПОЛУЧАЕМ USERNAME ИЗ TELEGRAM
+        let playerName = '';
+        
+        if (tg.initDataUnsafe?.user) {
+            const user = tg.initDataUnsafe.user;
+            
+            // Приоритет: username > first_name + last_name > first_name > ID
+            if (user.username) {
+                playerName = '@' + user.username;
+            } else if (user.first_name && user.last_name) {
+                playerName = user.first_name + ' ' + user.last_name;
+            } else if (user.first_name) {
+                playerName = user.first_name;
+            } else {
+                playerName = 'Player' + user.id;
+            }
+            
+            console.log('✅ Telegram данные:', user);
+        } else {
+            // Если не в Telegram - проверяем localStorage
+            const savedName = localStorage.getItem('playerName');
+            playerName = savedName || 'Игрок' + Math.floor(Math.random() * 9999);
+        }
+        
         console.log('👤 Имя игрока:', playerName);
+        document.getElementById('usernameDisplay').textContent = playerName;
 
         let balance = 0;
         let currentMultiplier = 1.00;
@@ -1041,6 +1125,43 @@
         const elBetsContainer = document.getElementById('betsContainer');
         const elOnlineCount = document.getElementById('onlineCount');
         const elHostBadge = document.getElementById('hostBadge');
+        const elUsernameDisplay = document.getElementById('usernameDisplay');
+
+        // 🎯 ФУНКЦИИ ДЛЯ СМЕНЫ ИМЕНИ
+        function openUsernameModal() {
+            document.getElementById('usernameModal').classList.add('show');
+            document.getElementById('usernameInput').value = playerName.replace('@', '');
+        }
+
+        function closeUsernameModal() {
+            document.getElementById('usernameModal').classList.remove('show');
+        }
+
+        function saveUsername() {
+            const newName = document.getElementById('usernameInput').value.trim();
+            
+            if (!newName || newName.length < 2) {
+                showNotification('❌ Имя должно быть минимум 2 символа', 'error');
+                return;
+            }
+
+            if (newName.length > 20) {
+                showNotification('❌ Имя слишком длинное (макс. 20 символов)', 'error');
+                return;
+            }
+
+            playerName = newName;
+            localStorage.setItem('playerName', playerName);
+            elUsernameDisplay.textContent = playerName;
+            
+            // Обновляем имя в Firebase
+            database.ref('players/' + playerId).update({
+                name: playerName
+            });
+
+            closeUsernameModal();
+            showNotification('✅ Имя изменено!', 'success');
+        }
 
         function getDepositModalBodyHtml() {
             return `
@@ -1297,12 +1418,16 @@
         window.onclick = function(event) {
             const depositModal = document.getElementById('depositModal');
             const withdrawModal = document.getElementById('withdrawModal');
+            const usernameModal = document.getElementById('usernameModal');
             
             if (event.target === depositModal) {
                 closeDepositModal();
             }
             if (event.target === withdrawModal) {
                 closeWithdrawModal();
+            }
+            if (event.target === usernameModal) {
+                closeUsernameModal();
             }
         }
 
