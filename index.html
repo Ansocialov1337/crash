@@ -73,6 +73,22 @@
             }
         }
 
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         @keyframes run {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-5px); }
@@ -99,6 +115,11 @@
                 transform: scale(1);
                 box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
             }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         header {
@@ -193,6 +214,238 @@
 
         .btn-withdraw:active {
             transform: scale(0.95);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 224, 255, 0.3);
+            border: 2px solid var(--accent-color);
+            animation: slideIn 0.3s;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--accent-color), #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--secondary-bg);
+            color: var(--main-text);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid #333;
+            background-color: var(--secondary-bg);
+            color: var(--main-text);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .form-input::placeholder {
+            color: #666;
+        }
+
+        .amount-presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .amount-preset-btn {
+            padding: 10px;
+            background: var(--secondary-bg);
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .amount-preset-btn:hover {
+            background: var(--hover-bg);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), #00bfff);
+            color: var(--black);
+            box-shadow: 0 4px 15px rgba(0, 224, 255, 0.3);
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 224, 255, 0.5);
+        }
+
+        .modal-btn-secondary {
+            background: var(--secondary-bg);
+            color: var(--main-text);
+            border: 2px solid #333;
+        }
+
+        .modal-btn-secondary:hover {
+            background: var(--hover-bg);
+            border-color: #555;
+        }
+
+        .card-icons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 25px;
+            background: var(--secondary-bg);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #888;
+            border: 1px solid #333;
+        }
+
+        .processing {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #333;
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            color: var(--warning-color);
+        }
+
+        .online-counter {
+            font-size: 0.8rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
         .main-container {
@@ -617,151 +870,6 @@
         .notification.error {
             border-left-color: var(--warning-color);
         }
-
-        .online-counter {
-            font-size: 0.8rem;
-            color: #888;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .online-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--success-color);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        /* МОДАЛЬНОЕ ОКНО */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            animation: slideInRight 0.3s;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #333;
-        }
-
-        .modal-header h2 {
-            color: var(--accent-color);
-            font-size: 1.5rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: #888;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.3s;
-        }
-
-        .modal-close:hover {
-            color: var(--warning-color);
-        }
-
-        .modal-body {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .modal-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .modal-input-group label {
-            font-size: 0.9rem;
-            color: #888;
-        }
-
-        .modal-input-group input {
-            padding: 12px;
-            font-size: 1rem;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .modal-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .modal-btn-primary {
-            background: linear-gradient(135deg, var(--accent-color), #00bfff);
-            color: var(--black);
-        }
-
-        .modal-btn-primary:active {
-            transform: scale(0.95);
-        }
-
-        .modal-btn-secondary {
-            background: var(--secondary-bg);
-            color: var(--main-text);
-            border: 1px solid #333;
-        }
-
-        .modal-btn-secondary:active {
-            transform: scale(0.95);
-        }
-
-        .modal-info {
-            background: var(--secondary-bg);
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: #aaa;
-            border-left: 3px solid var(--accent-color);
-        }
     </style>
 </head>
 <body>
@@ -789,12 +897,40 @@
         </div>
     </header>
 
+    <div class="modal-overlay" id="depositModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">💳 Пополнение баланса</div>
+                <button class="modal-close" onclick="closeDepositModal()">✕</button>
+            </div>
+            <div class="modal-body" id="depositModalBody"></div>
+            <div class="modal-footer" id="depositModalFooter">
+                <button class="modal-btn modal-btn-secondary" onclick="closeDepositModal()">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="processDeposit()">Пополнить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="withdrawModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">💰 Вывод средств</div>
+                <button class="modal-close" onclick="closeWithdrawModal()">✕</button>
+            </div>
+            <div class="modal-body" id="withdrawModalBody"></div>
+            <div class="modal-footer" id="withdrawModalFooter">
+                <button class="modal-btn modal-btn-secondary" onclick="closeWithdrawModal()">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="processWithdraw()">Вывести</button>
+            </div>
+        </div>
+    </div>
+
     <div class="main-container">
         <div class="game-column">
             <div class="game-area" id="gameArea">
                 <div class="host-badge" id="hostBadge">👑 ВЫ ХОСТ</div>
                 <div class="multiplier-display active" id="multiplier">1.00x</div>
-                <div id="statusText">Подключение...</div>
+                <div id="statusText">🔄 Подключение...</div>
                 <div class="countdown-timer" id="countdownTimer">5</div>
                 
                 <div class="road"></div>
@@ -834,69 +970,8 @@
                 <h3>🎰 Ставки в реальном времени</h3>
                 <div class="bets-container" id="betsContainer">
                     <div class="empty-bets">
-                        Подключение к серверу...
+                        🔄 Подключение к серверу...
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО ПОПОЛНЕНИЯ -->
-    <div class="modal" id="depositModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>💳 Пополнение</h2>
-                <button class="modal-close" onclick="closeDepositModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-input-group">
-                    <label>Сумма пополнения (₽)</label>
-                    <input type="number" id="depositAmount" value="100" min="10" placeholder="100">
-                </div>
-                <div class="modal-info">
-                    💡 Минимальная сумма: 10 ₽<br>
-                    ⚡️ Зачисление мгновенное
-                </div>
-                <div class="modal-buttons">
-                    <button class="modal-btn modal-btn-secondary" onclick="closeDepositModal()">
-                        Отмена
-                    </button>
-                    <button class="modal-btn modal-btn-primary" onclick="processDeposit()">
-                        Пополнить
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО ВЫВОДА -->
-    <div class="modal" id="withdrawModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>💰 Вывод средств</h2>
-                <button class="modal-close" onclick="closeWithdrawModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-input-group">
-                    <label>Сумма вывода (₽)</label>
-                    <input type="number" id="withdrawAmount" value="100" min="10" placeholder="100">
-                </div>
-                <div class="modal-input-group">
-                    <label>Номер карты</label>
-                    <input type="text" id="withdrawCard" placeholder="0000 0000 0000 0000" maxlength="19">
-                </div>
-                <div class="modal-info">
-                    💡 Минимальная сумма: 10 ₽<br>
-                    ⏱ Вывод в течение 24 часов<br>
-                    💳 Поддерживаются карты: Visa, MasterCard, МИР
-                </div>
-                <div class="modal-buttons">
-                    <button class="modal-btn modal-btn-secondary" onclick="closeWithdrawModal()">
-                        Отмена
-                    </button>
-                    <button class="modal-btn modal-btn-primary" onclick="processWithdraw()">
-                        Вывести
-                    </button>
                 </div>
             </div>
         </div>
@@ -905,6 +980,8 @@
     <div class="notification" id="notification"></div>
 
     <script>
+        console.log('🚀 Запуск приложения...');
+
         // 🔥 ИНИЦИАЛИЗАЦИЯ FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyB2DeQ0_RWb_O8GGblt9UbOzTdoc-jVbmE",
@@ -918,6 +995,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        console.log('✅ Firebase инициализирован');
 
         // 🎮 ГЕНЕРАЦИЯ ID ИГРОКА
         let playerId = localStorage.getItem('playerId');
@@ -925,12 +1003,14 @@
             playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('playerId', playerId);
         }
+        console.log('👤 ID игрока:', playerId);
 
         let tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
         
         let playerName = tg.initDataUnsafe?.user?.first_name || 'Игрок' + Math.floor(Math.random() * 9999);
+        console.log('👤 Имя игрока:', playerName);
 
         // 🎮 ПЕРЕМЕННЫЕ
         let balance = 0;
@@ -967,74 +1047,258 @@
         const elHostBadge = document.getElementById('hostBadge');
 
         // 💳 МОДАЛЬНЫЕ ОКНА
+        function getDepositModalBodyHtml() {
+            return `
+                <div class="form-group">
+                    <label class="form-label">Номер карты</label>
+                    <input type="text" class="form-input" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                    <div class="card-icons">
+                        <div class="card-icon">VISA</div>
+                        <div class="card-icon">MC</div>
+                        <div class="card-icon">MIR</div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label class="form-label">Срок действия</label>
+                        <input type="text" class="form-input" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CVV</label>
+                        <input type="text" class="form-input" id="cardCvv" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Сумма пополнения (₽)</label>
+                    <input type="number" class="form-input" id="depositAmount" placeholder="Введите сумму" min="100" max="100000">
+                    <div class="amount-presets">
+                        <button class="amount-preset-btn" onclick="setDepositAmount(1000)">1000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(5000)">5000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(10000)">10000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(25000)">25000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(50000)">50000</button>
+                        <button class="amount-preset-btn" onclick="setDepositAmount(100000)">100000</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Промокод (необязательно)</label>
+                    <input type="text" class="form-input" id="promoCodeInput" placeholder="Введите промокод" value="">
+                </div>
+            `;
+        }
+
         function openDepositModal() {
             document.getElementById('depositModal').classList.add('show');
+            document.getElementById('depositModalBody').innerHTML = getDepositModalBodyHtml();
+            document.getElementById('depositModalFooter').style.display = 'flex';
         }
 
         function closeDepositModal() {
             document.getElementById('depositModal').classList.remove('show');
         }
 
-        function openWithdrawModal() {
-            if (balance < 10) {
-                showNotification('❌ Минимальная сумма для вывода: 10 ₽', 'error');
+        function setDepositAmount(amount) {
+            document.getElementById('depositAmount').value = amount;
+        }
+
+        function processDeposit() {
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCvv = document.getElementById('cardCvv').value;
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            const promoCode = document.getElementById('promoCodeInput').value;
+
+            if (!cardNumber || cardNumber.length < 13) {
+                showNotification('❌ Введите корректный номер карты', 'error');
                 return;
             }
+
+            if (!cardExpiry || cardExpiry.length < 4) {
+                showNotification('❌ Введите срок действия карты', 'error');
+                return;
+            }
+
+            if (!cardCvv || cardCvv.length < 3) {
+                showNotification('❌ Введите CVV код', 'error');
+                return;
+            }
+
+            if (!amount || amount < 100 || amount > 100000) {
+                showNotification('❌ Сумма должна быть от 100 до 100000 ₽', 'error');
+                return;
+            }
+
+            document.getElementById('depositModalBody').innerHTML = `
+                <div class="processing">
+                    <div class="spinner"></div>
+                    <div style="font-size: 1.1rem; color: var(--accent-color); font-weight: bold;">
+                        Обработка платежа...
+                    </div>
+                    <div style="margin-top: 10px; color: #888;">
+                        Пожалуйста, подождите
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('depositModalFooter').style.display = 'none';
+
+            setTimeout(() => {
+                if (promoCode !== 'AnsocialovGift') {
+                    document.getElementById('depositModalBody').innerHTML = `
+                        <div class="processing">
+                            <div class="error-icon">❌</div>
+                            <div style="font-size: 1.3rem; color: var(--warning-color); font-weight: bold; margin-bottom: 10px;">
+                                Транзакция отменена
+                            </div>
+                            <div style="font-size: 1rem; color: #888; text-align: center;">
+                                Платеж не был обработан банком.<br>Попробуйте позже или используйте другую карту.
+                            </div>
+                        </div>
+                    `;
+
+                    showNotification('❌ Транзакция отменена', 'error');
+
+                    setTimeout(() => {
+                        closeDepositModal();
+                    }, 3000);
+                } else {
+                    balance += amount;
+                    updateBalanceUI();
+
+                    document.getElementById('depositModalBody').innerHTML = `
+                        <div class="processing">
+                            <div class="success-icon">✅</div>
+                            <div style="font-size: 1.3rem; color: var(--success-color); font-weight: bold; margin-bottom: 10px;">
+                                Успешно!
+                            </div>
+                            <div style="font-size: 1.1rem; color: var(--main-text);">
+                                На ваш счет зачислено
+                            </div>
+                            <div style="font-size: 2rem; color: var(--accent-color); font-weight: bold; margin-top: 10px;">
+                                ${amount} ₽
+                            </div>
+                        </div>
+                    `;
+
+                    showNotification(`🎉 Баланс пополнен на ${amount} ₽!`, 'success');
+
+                    setTimeout(() => {
+                        closeDepositModal();
+                    }, 2000);
+                }
+            }, 2000);
+        }
+
+        function getWithdrawModalBodyHtml() {
+            return `
+                <div class="form-group">
+                    <label class="form-label">Номер карты для вывода</label>
+                    <input type="text" class="form-input" id="withdrawCardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                    <div class="card-icons">
+                        <div class="card-icon">VISA</div>
+                        <div class="card-icon">MC</div>
+                        <div class="card-icon">MIR</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Сумма вывода (₽)</label>
+                    <input type="number" class="form-input" id="withdrawAmount" placeholder="Введите сумму" min="100" max="${balance}">
+                    <div class="amount-presets">
+                        <button class="amount-preset-btn" onclick="setWithdrawAmount(1000)">1000</button>
+                        <button class="amount-preset-btn" onclick="setWithdrawAmount(5000)">5000</button>
+                        <button class="amount-preset-btn" onclick="setWithdrawAmount(10000)">10000</button>
+                        <button class="amount-preset-btn" onclick="setWithdrawAmount(${balance})">ВСЁ</button>
+                    </div>
+                </div>
+
+                <div style="background: var(--secondary-bg); padding: 15px; border-radius: 8px; font-size: 0.85rem; color: #aaa; border-left: 3px solid var(--accent-color);">
+                    💡 Минимальная сумма вывода: 100 ₽<br>
+                    ⏱ Вывод обрабатывается в течение 24 часов<br>
+                    💳 Комиссия: 0%
+                </div>
+            `;
+        }
+
+        function openWithdrawModal() {
+            if (balance < 100) {
+                showNotification('❌ Минимальная сумма для вывода: 100 ₽', 'error');
+                return;
+            }
+
             document.getElementById('withdrawModal').classList.add('show');
+            document.getElementById('withdrawModalBody').innerHTML = getWithdrawModalBodyHtml();
+            document.getElementById('withdrawModalFooter').style.display = 'flex';
         }
 
         function closeWithdrawModal() {
             document.getElementById('withdrawModal').classList.remove('show');
         }
 
-        function processDeposit() {
-            const amount = parseInt(document.getElementById('depositAmount').value);
-            
-            if (isNaN(amount) || amount < 10) {
-                showNotification('❌ Минимальная сумма: 10 ₽', 'error');
-                return;
-            }
-
-            // Имитация пополнения (в реальности здесь будет платёжная система)
-            balance += amount;
-            updateBalanceUI();
-            
-            closeDepositModal();
-            showNotification(`✅ Баланс пополнен на ${amount} ₽`, 'success');
+        function setWithdrawAmount(amount) {
+            document.getElementById('withdrawAmount').value = amount;
         }
 
         function processWithdraw() {
+            const cardNumber = document.getElementById('withdrawCardNumber').value.replace(/\s/g, '');
             const amount = parseInt(document.getElementById('withdrawAmount').value);
-            const card = document.getElementById('withdrawCard').value;
-            
-            if (isNaN(amount) || amount < 10) {
-                showNotification('❌ Минимальная сумма: 10 ₽', 'error');
-                return;
-            }
 
-            if (amount > balance) {
-                showNotification('❌ Недостаточно средств', 'error');
-                return;
-            }
-
-            if (!card || card.length < 16) {
+            if (!cardNumber || cardNumber.length < 13) {
                 showNotification('❌ Введите корректный номер карты', 'error');
                 return;
             }
 
-            // Имитация вывода (в реальности здесь будет API платёжной системы)
-            balance -= amount;
-            updateBalanceUI();
-            
-            closeWithdrawModal();
-            showNotification(`✅ Заявка на вывод ${amount} ₽ принята`, 'success');
-            
-            // Очистка полей
-            document.getElementById('withdrawAmount').value = '100';
-            document.getElementById('withdrawCard').value = '';
+            if (!amount || amount < 100 || amount > balance) {
+                showNotification('❌ Проверьте сумму вывода', 'error');
+                return;
+            }
+
+            document.getElementById('withdrawModalBody').innerHTML = `
+                <div class="processing">
+                    <div class="spinner"></div>
+                    <div style="font-size: 1.1rem; color: var(--accent-color); font-weight: bold;">
+                        Обработка заявки...
+                    </div>
+                    <div style="margin-top: 10px; color: #888;">
+                        Пожалуйста, подождите
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('withdrawModalFooter').style.display = 'none';
+
+            setTimeout(() => {
+                balance -= amount;
+                updateBalanceUI();
+
+                document.getElementById('withdrawModalBody').innerHTML = `
+                    <div class="processing">
+                        <div class="success-icon">✅</div>
+                        <div style="font-size: 1.3rem; color: var(--success-color); font-weight: bold; margin-bottom: 10px;">
+                            Заявка принята!
+                        </div>
+                        <div style="font-size: 1rem; color: var(--main-text); text-align: center;">
+                            Средства будут переведены на карту<br>
+                            <strong>**** ${cardNumber.slice(-4)}</strong><br>
+                            в течение 24 часов
+                        </div>
+                        <div style="font-size: 2rem; color: var(--accent-color); font-weight: bold; margin-top: 10px;">
+                            ${amount} ₽
+                        </div>
+                    </div>
+                `;
+
+                showNotification(`✅ Заявка на вывод ${amount} ₽ принята`, 'success');
+
+                setTimeout(() => {
+                    closeWithdrawModal();
+                }, 3000);
+            }, 2000);
         }
 
-        // Закрытие модалок по клику вне окна
         window.onclick = function(event) {
             const depositModal = document.getElementById('depositModal');
             const withdrawModal = document.getElementById('withdrawModal');
@@ -1047,74 +1311,89 @@
             }
         }
 
-        // Форматирование номера карты
-        document.getElementById('withdrawCard').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\s/g, '');
-            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-            e.target.value = formattedValue;
+        document.addEventListener('input', function(e) {
+            if (e.target && (e.target.id === 'cardNumber' || e.target.id === 'withdrawCardNumber')) {
+                let value = e.target.value.replace(/\s/g, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                e.target.value = formattedValue;
+            }
+
+            if (e.target && e.target.id === 'cardExpiry') {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                }
+                e.target.value = value;
+            }
         });
 
-        // 🔥 РЕГИСТРАЦИЯ ИГРОКА С ПРИОРИТЕТОМ
-        const playerRef = database.ref('players/' + playerId);
-        
+        // 🔥 РЕГИСТРАЦИЯ ИГРОКА
         async function registerPlayer() {
-            await playerRef.set({
-                name: playerName,
-                online: true,
-                joinedAt: Date.now(),
-                lastSeen: Date.now()
-            });
-            
-            playerRef.onDisconnect().remove();
-            
-            // Обновляем lastSeen каждые 10 секунд
-            setInterval(() => {
-                playerRef.update({ lastSeen: Date.now() });
-            }, 10000);
+            console.log('📝 Регистрация игрока...');
+            try {
+                const playerRef = database.ref('players/' + playerId);
+                
+                await playerRef.set({
+                    name: playerName,
+                    online: true,
+                    joinedAt: Date.now(),
+                    lastSeen: Date.now()
+                });
+                
+                console.log('✅ Игрок зарегистрирован');
+                
+                playerRef.onDisconnect().remove();
+                
+                setInterval(() => {
+                    playerRef.update({ lastSeen: Date.now() });
+                }, 10000);
+            } catch (error) {
+                console.error('❌ Ошибка регистрации:', error);
+            }
         }
-
-        registerPlayer();
 
         // 🔥 СЛУШАЕМ ОНЛАЙН
         database.ref('players').on('value', (snapshot) => {
             const players = snapshot.val();
             const onlineCount = players ? Object.keys(players).length : 0;
             elOnlineCount.textContent = onlineCount;
+            console.log('👥 Игроков онлайн:', onlineCount);
         });
 
-        // 👑 СИСТЕМА ХОСТА - САМЫЙ ПЕРВЫЙ ИГРОК
-        const hostRef = database.ref('gameHost');
-        
-        hostRef.on('value', async (snapshot) => {
-            const host = snapshot.val();
+        // 👑 СИСТЕМА ХОСТА
+        async function checkAndBecomeHost() {
+            console.log('👑 Проверка хоста...');
+            
+            const hostRef = database.ref('gameHost');
+            const hostSnapshot = await hostRef.once('value');
+            const host = hostSnapshot.val();
             
             if (!host || !host.playerId) {
+                console.log('👑 Хоста нет, становлюсь хостом');
                 await tryBecomeHost();
             } else {
+                console.log('👑 Хост уже есть:', host.playerName);
+                
                 const hostPlayerRef = database.ref('players/' + host.playerId);
                 const hostPlayerSnapshot = await hostPlayerRef.once('value');
                 const hostPlayer = hostPlayerSnapshot.val();
                 
                 if (!hostPlayer || (Date.now() - hostPlayer.lastSeen > 30000)) {
-                    console.log('🔄 Хост неактивен, захватываем...');
+                    console.log('👑 Хост неактивен, захватываю...');
                     await tryBecomeHost();
                 } else if (host.playerId === playerId) {
-                    if (!isHost) {
-                        isHost = true;
-                        elHostBadge.classList.add('show');
-                        console.log('👑 Вы стали хостом!');
-                        showNotification('👑 Вы теперь хост игры!', 'success');
-                        startHostLoop();
-                    }
-                } else {
-                    isHost = false;
-                    elHostBadge.classList.remove('show');
+                    console.log('👑 Я уже хост!');
+                    isHost = true;
+                    elHostBadge.classList.add('show');
+                    startHostLoop();
                 }
             }
-        });
+        }
 
         async function tryBecomeHost() {
             try {
+                const hostRef = database.ref('gameHost');
+                
                 await hostRef.set({
                     playerId: playerId,
                     playerName: playerName,
@@ -1125,7 +1404,7 @@
                 
                 isHost = true;
                 elHostBadge.classList.add('show');
-                console.log('👑 Вы стали хостом!');
+                console.log('👑 Стал хостом!');
                 showNotification('👑 Вы теперь хост игры!', 'success');
                 
                 startHostLoop();
@@ -1134,7 +1413,6 @@
             }
         }
 
-        // 🎮 ХОСТ ЗАПУСКАЕТ РАУНДЫ
         function startHostLoop() {
             if (!isHost || hostLoopRunning) return;
             
@@ -1207,8 +1485,6 @@
                             updates[`bets/${betId}/status`] = 'crashed';
                             updates[`bets/${betId}/multiplier`] = crashPoint;
                             updates[`bets/${betId}/profit`] = -bet.betAmount;
-                            
-                            console.log(`❌ Игрок ${bet.playerName} проиграл ${bet.betAmount} ₽`);
                         }
                     });
                     
@@ -1268,7 +1544,6 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        // 🔥 СЛУШАЕМ РАУНДЫ
         database.ref('currentRound').on('value', (snapshot) => {
             const round = snapshot.val();
             
@@ -1292,7 +1567,6 @@
             }
         });
 
-        // 🔥 СЛУШАЕМ СТАВКИ
         database.ref('bets').on('value', (snapshot) => {
             currentRoundBets = [];
             const bets = snapshot.val();
@@ -1317,7 +1591,6 @@
             updateBetsUI();
         });
 
-        // 🎮 ИГРОВЫЕ ФУНКЦИИ
         function initBalance() {
             const savedDate = localStorage.getItem('lastLoginDate');
             const savedBalance = localStorage.getItem('userBalance');
@@ -1569,47 +1842,33 @@
             }, 3000);
         }
 
-        // 🚀 ЗАПУСК
-        initBalance();
-        elStatus.innerText = "🔄 Ожидание раунда...";
-        
+        // 🚀 ЗАПУСК ПРИЛОЖЕНИЯ
+        async function initApp() {
+            console.log('🚀 Инициализация приложения...');
+            
+            initBalance();
+            
+            await registerPlayer();
+            
+            await checkAndBecomeHost();
+            
+            console.log('✅ Приложение готово!');
+        }
+
+        // Запускаем после загрузки Firebase
+        setTimeout(() => {
+            initApp();
+        }, 1000);
+
         database.ref('.info/connected').on('value', (snapshot) => {
             if (snapshot.val() === true) {
+                console.log('✅ Подключено к Firebase');
                 showNotification('✅ Подключено к серверу', 'success');
             } else {
+                console.log('❌ Нет подключения к Firebase');
                 showNotification('❌ Нет подключения', 'error');
             }
         });
-
-        // 🧹 ОЧИСТКА СТАРЫХ ДАННЫХ (только для хоста)
-        setInterval(async () => {
-            if (!isHost) return;
-            
-            try {
-                const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
-                
-                const betsSnapshot = await database.ref('bets').once('value');
-                const bets = betsSnapshot.val();
-                
-                if (bets) {
-                    const updates = {};
-                    
-                    Object.keys(bets).forEach(betId => {
-                        const bet = bets[betId];
-                        if (bet.timestamp < fiveMinutesAgo) {
-                            updates[`bets/${betId}`] = null;
-                        }
-                    });
-                    
-                    if (Object.keys(updates).length > 0) {
-                        await database.ref().update(updates);
-                        console.log(`🧹 Удалено ${Object.keys(updates).length} старых ставок`);
-                    }
-                }
-            } catch (error) {
-                console.error('❌ Ошибка очистки:', error);
-            }
-        }, 5 * 60 * 1000);
     </script>
 </body>
 </html>
