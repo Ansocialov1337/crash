@@ -17,7 +17,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
             color: white;
-            overflow-x: hidden;
+            overflow: hidden;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -27,122 +27,94 @@
         .header {
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
-            padding: 10px 15px;
+            padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(0, 224, 255, 0.2);
         }
 
-        .balance-section {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
         .balance {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #00e0ff;
         }
 
-        .add-balance-btn {
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
             background: rgba(0, 224, 255, 0.2);
             border: 1px solid #00e0ff;
             color: #00e0ff;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .add-balance-btn:active {
-            transform: scale(0.95);
-            background: rgba(0, 224, 255, 0.3);
-        }
-
-        .menu-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        /* Основной контейнер игры */
-        .game-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            overflow-y: auto;
-            gap: 15px;
-        }
-
-        /* Компактная игровая зона */
+        /* Игровая зона - занимает всё свободное место */
         .game-area {
+            flex: 1;
             background: rgba(0, 0, 0, 0.4);
+            margin: 10px;
             border: 2px solid rgba(0, 224, 255, 0.3);
             border-radius: 15px;
-            padding: 15px;
             position: relative;
-            min-height: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .multiplier {
-            font-size: 48px;
+            font-size: 64px;
             font-weight: bold;
             background: linear-gradient(90deg, #00e0ff, #00ff88);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-align: center;
-            margin-bottom: 10px;
+            line-height: 1;
         }
 
         .runner {
-            font-size: 40px;
+            font-size: 50px;
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             left: 20px;
             transition: left 0.1s linear;
         }
 
         .status-text {
-            font-size: 16px;
+            font-size: 14px;
             color: #888;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
-        /* Компактная панель управления */
+        /* Компактная панель управления - всё в одном блоке */
         .controls {
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(0, 224, 255, 0.3);
-            border-radius: 15px;
-            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 10px 12px;
+            border-top: 1px solid rgba(0, 224, 255, 0.2);
         }
 
-        .bet-section {
-            margin-bottom: 15px;
+        /* Ставка в одну строку */
+        .bet-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 8px;
         }
 
         .bet-label {
-            font-size: 14px;
+            font-size: 12px;
             color: #888;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .bet-input-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
+            min-width: 45px;
         }
 
         .bet-input {
@@ -150,144 +122,98 @@
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(0, 224, 255, 0.3);
             color: white;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 16px;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 14px;
             text-align: center;
         }
 
-        .bet-btn {
+        .bet-mini-btn {
             background: rgba(0, 224, 255, 0.2);
             border: 1px solid #00e0ff;
             color: #00e0ff;
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 12px;
             cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
+            min-width: 35px;
         }
 
-        .bet-btn:active {
-            transform: scale(0.95);
-            background: rgba(0, 224, 255, 0.3);
-        }
-
+        /* Быстрые ставки компактно */
         .quick-bets {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
         }
 
         .quick-bet {
+            flex: 1;
             background: rgba(0, 224, 255, 0.1);
             border: 1px solid rgba(0, 224, 255, 0.3);
             color: #00e0ff;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 13px;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 12px;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .quick-bet:active {
-            transform: scale(0.95);
-            background: rgba(0, 224, 255, 0.2);
-        }
-
-        /* Главные кнопки действий */
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .action-btn {
-            padding: 15px;
+        /* Главная кнопка */
+        .main-btn {
+            width: 100%;
+            padding: 14px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
             text-transform: uppercase;
         }
 
         .start-btn {
             background: linear-gradient(135deg, #00e0ff 0%, #00ff88 100%);
             color: #000;
-            grid-column: 1 / -1;
-        }
-
-        .start-btn:active {
-            transform: scale(0.98);
-            box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
-        }
-
-        .start-btn:disabled {
-            background: #333;
-            color: #666;
-            cursor: not-allowed;
         }
 
         .cashout-btn {
             background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
             color: #000;
-            grid-column: 1 / -1;
             animation: pulse 1s infinite;
         }
 
-        .cashout-btn:active {
-            transform: scale(0.98);
-        }
-
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.9); }
         }
 
-        /* История (компактная) */
-        .history-section {
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(0, 224, 255, 0.3);
-            border-radius: 15px;
-            padding: 12px;
-        }
-
-        .history-title {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 8px;
-        }
-
-        .history-list {
+        /* История - минимальная */
+        .mini-history {
             display: flex;
-            gap: 8px;
+            gap: 4px;
+            margin-bottom: 8px;
             overflow-x: auto;
-            padding-bottom: 5px;
+            padding: 2px 0;
         }
 
-        .history-item {
+        .mini-history-item {
             background: rgba(0, 224, 255, 0.1);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
             white-space: nowrap;
             border: 1px solid rgba(0, 224, 255, 0.3);
         }
 
-        .history-item.win {
+        .mini-history-item.win {
             color: #00ff88;
             border-color: #00ff88;
         }
 
-        .history-item.loss {
+        .mini-history-item.loss {
             color: #ff4444;
             border-color: #ff4444;
         }
 
-        /* Модальное окно */
+        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -295,7 +221,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -330,25 +256,17 @@
             margin-bottom: 20px;
         }
 
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
         .modal-btn {
-            flex: 1;
+            width: 100%;
             padding: 12px;
             border: none;
             border-radius: 10px;
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .modal-btn.primary {
             background: linear-gradient(135deg, #00e0ff 0%, #00ff88 100%);
             color: #000;
+            margin-top: 10px;
         }
 
         .modal-btn.secondary {
@@ -357,68 +275,47 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .modal-btn:active {
-            transform: scale(0.95);
-        }
-
         /* Меню */
-        .menu-modal .modal-content {
-            text-align: left;
-        }
-
         .menu-item {
-            padding: 15px;
+            padding: 12px;
             background: rgba(0, 224, 255, 0.1);
             border: 1px solid rgba(0, 224, 255, 0.3);
             border-radius: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             cursor: pointer;
-            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 14px;
         }
 
-        .menu-item:active {
-            transform: scale(0.98);
-            background: rgba(0, 224, 255, 0.2);
-        }
-
-        /* Адаптация под очень маленькие экраны */
+        /* Адаптация под маленькие экраны */
         @media (max-height: 600px) {
-            .game-area {
-                min-height: 150px;
-            }
-            
             .multiplier {
-                font-size: 36px;
+                font-size: 48px;
             }
-            
             .runner {
-                font-size: 30px;
+                font-size: 40px;
+                bottom: 20px;
             }
-            
             .controls {
-                padding: 12px;
+                padding: 8px 10px;
             }
-            
-            .action-btn {
+            .main-btn {
                 padding: 12px;
-                font-size: 14px;
             }
         }
 
         /* Скрытие скроллбара */
-        .history-list::-webkit-scrollbar {
-            height: 4px;
+        .mini-history::-webkit-scrollbar {
+            height: 3px;
         }
 
-        .history-list::-webkit-scrollbar-track {
+        .mini-history::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 2px;
         }
 
-        .history-list::-webkit-scrollbar-thumb {
+        .mini-history::-webkit-scrollbar-thumb {
             background: rgba(0, 224, 255, 0.5);
             border-radius: 2px;
         }
@@ -427,51 +324,45 @@
 <body>
     <!-- Шапка -->
     <div class="header">
-        <div class="balance-section">
-            <div class="balance">💰 <span id="balance">1000</span></div>
-            <button class="add-balance-btn" onclick="showAddBalanceModal()">+ Пополнить</button>
+        <div class="balance">💰 <span id="balance">1000</span></div>
+        <div class="header-buttons">
+            <button class="header-btn" onclick="showAddBalanceModal()">+</button>
+            <button class="header-btn" onclick="showMenu()">☰</button>
         </div>
-        <button class="menu-btn" onclick="showMenu()">☰</button>
     </div>
 
-    <!-- Основной контейнер -->
-    <div class="game-container">
-        <!-- Игровая зона -->
-        <div class="game-area">
-            <div class="multiplier" id="multiplier">1.00x</div>
-            <div class="runner" id="runner">🏃</div>
-            <div class="status-text" id="status">Сделайте ставку для начала</div>
-        </div>
+    <!-- Игровая зона -->
+    <div class="game-area">
+        <div class="multiplier" id="multiplier">1.00x</div>
+        <div class="runner" id="runner">🏃</div>
+        <div class="status-text" id="status">Сделайте ставку</div>
+    </div>
 
-        <!-- Панель управления -->
-        <div class="controls">
-            <div class="bet-section">
-                <label class="bet-label">Ставка:</label>
-                <div class="bet-input-group">
-                    <input type="number" id="betAmount" class="bet-input" value="100" min="10">
-                    <button class="bet-btn" onclick="halfBet()">½</button>
-                    <button class="bet-btn" onclick="doubleBet()">2×</button>
-                </div>
-                <div class="quick-bets">
-                    <button class="quick-bet" onclick="setBet(50)">50</button>
-                    <button class="quick-bet" onclick="setBet(100)">100</button>
-                    <button class="quick-bet" onclick="setBet(250)">250</button>
-                    <button class="quick-bet" onclick="setBet(500)">500</button>
-                </div>
-            </div>
-
-            <div class="action-buttons" id="actionButtons">
-                <button class="action-btn start-btn" id="startBtn" onclick="startGame()">
-                    🚀 Начать игру
-                </button>
-            </div>
+    <!-- Компактная панель управления -->
+    <div class="controls">
+        <!-- Мини история -->
+        <div class="mini-history" id="miniHistory"></div>
+        
+        <!-- Ставка в одну строку -->
+        <div class="bet-row">
+            <span class="bet-label">Ставка:</span>
+            <input type="number" id="betAmount" class="bet-input" value="100" min="10">
+            <button class="bet-mini-btn" onclick="halfBet()">½</button>
+            <button class="bet-mini-btn" onclick="doubleBet()">2×</button>
         </div>
-
-        <!-- История -->
-        <div class="history-section">
-            <div class="history-title">📊 Последние игры:</div>
-            <div class="history-list" id="history"></div>
+        
+        <!-- Быстрые ставки -->
+        <div class="quick-bets">
+            <button class="quick-bet" onclick="setBet(50)">50</button>
+            <button class="quick-bet" onclick="setBet(100)">100</button>
+            <button class="quick-bet" onclick="setBet(250)">250</button>
+            <button class="quick-bet" onclick="setBet(500)">500</button>
         </div>
+        
+        <!-- Главная кнопка -->
+        <button class="main-btn start-btn" id="mainBtn" onclick="startGame()">
+            🚀 Начать игру
+        </button>
     </div>
 
     <!-- Модальное окно результата -->
@@ -479,48 +370,42 @@
         <div class="modal-content">
             <div class="modal-title" id="resultTitle">🎉 Победа!</div>
             <div class="modal-text" id="resultText">Вы выиграли 250₽</div>
-            <div class="modal-buttons">
-                <button class="modal-btn primary" onclick="closeResultModal()">Отлично!</button>
-            </div>
+            <button class="modal-btn" onclick="closeResultModal()">Отлично!</button>
         </div>
     </div>
 
     <!-- Модальное окно пополнения -->
     <div class="modal" id="addBalanceModal">
         <div class="modal-content">
-            <div class="modal-title">💳 Пополнение баланса</div>
-            <div class="modal-text">Выберите сумму пополнения:</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <div class="modal-title">💳 Пополнение</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
                 <button class="quick-bet" style="padding: 12px;" onclick="addBalance(500)">+500₽</button>
                 <button class="quick-bet" style="padding: 12px;" onclick="addBalance(1000)">+1000₽</button>
                 <button class="quick-bet" style="padding: 12px;" onclick="addBalance(2500)">+2500₽</button>
                 <button class="quick-bet" style="padding: 12px;" onclick="addBalance(5000)">+5000₽</button>
             </div>
-            <div class="modal-buttons">
-                <button class="modal-btn secondary" onclick="closeAddBalanceModal()">Отмена</button>
-            </div>
+            <button class="modal-btn secondary" onclick="closeAddBalanceModal()">Отмена</button>
         </div>
     </div>
 
     <!-- Меню -->
-    <div class="modal menu-modal" id="menuModal">
+    <div class="modal" id="menuModal">
+        <div class="modal-content" style="text-align: left;">
+            <div class="modal-title" style="text-align: center;">☰ Меню</div>
+            <div class="menu-item" onclick="showRules()">📖 Правила игры</div>
+            <div class="menu-item" onclick="showStats()">📊 Статистика</div>
+            <div class="menu-item" onclick="showHistory()">📜 История игр</div>
+            <div class="menu-item" onclick="showSupport()">💬 Поддержка</div>
+            <button class="modal-btn secondary" onclick="closeMenu()">Закрыть</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно истории -->
+    <div class="modal" id="historyModal">
         <div class="modal-content">
-            <div class="modal-title">☰ Меню</div>
-            <div class="menu-item" onclick="showRules()">
-                📖 Правила игры
-            </div>
-            <div class="menu-item" onclick="showStats()">
-                📊 Статистика
-            </div>
-            <div class="menu-item" onclick="showSettings()">
-                ⚙️ Настройки
-            </div>
-            <div class="menu-item" onclick="showSupport()">
-                💬 Поддержка
-            </div>
-            <div style="margin-top: 15px;">
-                <button class="modal-btn secondary" style="width: 100%;" onclick="closeMenu()">Закрыть</button>
-            </div>
+            <div class="modal-title">📜 История игр</div>
+            <div id="fullHistory" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
+            <button class="modal-btn secondary" onclick="closeHistory()">Закрыть</button>
         </div>
     </div>
 
@@ -565,12 +450,12 @@
             betAmount = parseInt(document.getElementById('betAmount').value);
             
             if (betAmount < 10) {
-                alert('Минимальная ставка: 10₽');
+                tg.showAlert('Минимальная ставка: 10₽');
                 return;
             }
             
             if (betAmount > balance) {
-                alert('Недостаточно средств!');
+                tg.showAlert('Недостаточно средств!');
                 return;
             }
 
@@ -582,15 +467,12 @@
             crashPoint = generateCrashPoint();
             
             document.getElementById('status').textContent = '🎮 Игра идёт...';
-            document.getElementById('startBtn').style.display = 'none';
             
-            // Показываем кнопку забрать
-            const actionButtons = document.getElementById('actionButtons');
-            actionButtons.innerHTML = `
-                <button class="action-btn cashout-btn" onclick="cashout()">
-                    💰 ЗАБРАТЬ ${(betAmount * currentMultiplier).toFixed(0)}₽
-                </button>
-            `;
+            // Меняем кнопку на "Забрать"
+            const mainBtn = document.getElementById('mainBtn');
+            mainBtn.className = 'main-btn cashout-btn';
+            mainBtn.onclick = cashout;
+            mainBtn.innerHTML = `💰 ЗАБРАТЬ ${betAmount}₽`;
             
             runGame();
         }
@@ -622,7 +504,7 @@
                 currentMultiplier += 0.01;
                 position += 2;
                 
-                if (position > window.innerWidth - 60) {
+                if (position > window.innerWidth - 80) {
                     position = 20;
                 }
                 
@@ -630,10 +512,8 @@
                 document.getElementById('multiplier').textContent = currentMultiplier.toFixed(2) + 'x';
                 
                 // Обновляем сумму на кнопке
-                const cashoutBtn = document.querySelector('.cashout-btn');
-                if (cashoutBtn) {
-                    cashoutBtn.innerHTML = `💰 ЗАБРАТЬ ${(betAmount * currentMultiplier).toFixed(0)}₽`;
-                }
+                const mainBtn = document.getElementById('mainBtn');
+                mainBtn.innerHTML = `💰 ЗАБРАТЬ ${Math.floor(betAmount * currentMultiplier)}₽`;
             }, 100);
         }
 
@@ -648,7 +528,7 @@
             balance += winAmount;
             updateBalance();
             
-            addToHistory(currentMultiplier, true);
+            addToHistory(currentMultiplier, true, winAmount);
             showResult(true, winAmount, currentMultiplier);
             resetGame();
         }
@@ -662,7 +542,7 @@
             document.getElementById('status').textContent = `Краш на ${crashPoint.toFixed(2)}x`;
             document.getElementById('runner').textContent = '💀';
             
-            addToHistory(crashPoint, false);
+            addToHistory(crashPoint, false, betAmount);
             showResult(false, betAmount, crashPoint);
             
             setTimeout(resetGame, 2000);
@@ -671,31 +551,34 @@
         // Сброс игры
         function resetGame() {
             document.getElementById('multiplier').textContent = '1.00x';
-            document.getElementById('status').textContent = 'Сделайте ставку для начала';
+            document.getElementById('status').textContent = 'Сделайте ставку';
             document.getElementById('runner').textContent = '🏃';
             document.getElementById('runner').style.left = '20px';
             
-            const actionButtons = document.getElementById('actionButtons');
-            actionButtons.innerHTML = `
-                <button class="action-btn start-btn" id="startBtn" onclick="startGame()">
-                    🚀 Начать игру
-                </button>
-            `;
+            const mainBtn = document.getElementById('mainBtn');
+            mainBtn.className = 'main-btn start-btn';
+            mainBtn.onclick = startGame;
+            mainBtn.innerHTML = '🚀 Начать игру';
         }
 
         // История
-        function addToHistory(multiplier, isWin) {
-            history.unshift({ multiplier: multiplier.toFixed(2), isWin });
-            if (history.length > 10) history.pop();
+        function addToHistory(multiplier, isWin, amount) {
+            history.unshift({ 
+                multiplier: multiplier.toFixed(2), 
+                isWin, 
+                amount,
+                time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+            });
+            if (history.length > 20) history.pop();
             localStorage.setItem('history', JSON.stringify(history));
-            updateHistoryDisplay();
+            updateMiniHistory();
         }
 
-        function updateHistoryDisplay() {
-            const historyList = document.getElementById('history');
-            historyList.innerHTML = history.map(item => 
-                `<div class="history-item ${item.isWin ? 'win' : 'loss'}">
-                    ${item.isWin ? '✓' : '✗'} ${item.multiplier}x
+        function updateMiniHistory() {
+            const miniHistory = document.getElementById('miniHistory');
+            miniHistory.innerHTML = history.slice(0, 8).map(item => 
+                `<div class="mini-history-item ${item.isWin ? 'win' : 'loss'}">
+                    ${item.multiplier}x
                 </div>`
             ).join('');
         }
@@ -708,11 +591,15 @@
             
             if (isWin) {
                 title.textContent = '🎉 Победа!';
-                title.style.color = '#00ff88';
+                title.style.background = 'linear-gradient(90deg, #00ff88, #00e0ff)';
+                title.style.webkitBackgroundClip = 'text';
+                title.style.webkitTextFillColor = 'transparent';
                 text.textContent = `Вы выиграли ${amount}₽ (${multiplier.toFixed(2)}x)`;
             } else {
                 title.textContent = '💥 Проигрыш';
-                title.style.color = '#ff4444';
+                title.style.background = 'linear-gradient(90deg, #ff4444, #ff8844)';
+                title.style.webkitBackgroundClip = 'text';
+                title.style.webkitTextFillColor = 'transparent';
                 text.textContent = `Краш на ${multiplier.toFixed(2)}x. Потеряно ${amount}₽`;
             }
             
@@ -735,7 +622,7 @@
             balance += amount;
             updateBalance();
             closeAddBalanceModal();
-            alert(`Баланс пополнен на ${amount}₽`);
+            tg.showAlert(`Баланс пополнен на ${amount}₽`);
         }
 
         function showMenu() {
@@ -748,7 +635,7 @@
 
         function showRules() {
             closeMenu();
-            alert('📖 Правила:\n\n1. Сделайте ставку\n2. Нажмите "Начать игру"\n3. Множитель растёт\n4. Заберите выигрыш до краша!\n5. Чем дольше ждёте - тем больше выигрыш, но выше риск!');
+            tg.showAlert('📖 Правила:\n\n1. Сделайте ставку\n2. Нажмите "Начать игру"\n3. Множитель растёт\n4. Заберите выигрыш до краша!\n5. Чем дольше ждёте - тем больше выигрыш, но выше риск!');
         }
 
         function showStats() {
@@ -756,22 +643,45 @@
             const wins = history.filter(h => h.isWin).length;
             const total = history.length;
             const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
-            alert(`📊 Статистика:\n\nВсего игр: ${total}\nПобед: ${wins}\nПроцент побед: ${winRate}%\nБаланс: ${balance}₽`);
+            const totalWon = history.filter(h => h.isWin).reduce((sum, h) => sum + h.amount, 0);
+            const totalLost = history.filter(h => !h.isWin).reduce((sum, h) => sum + h.amount, 0);
+            tg.showAlert(`📊 Статистика:\n\nВсего игр: ${total}\nПобед: ${wins}\nПроцент побед: ${winRate}%\nВыиграно: ${totalWon}₽\nПроиграно: ${totalLost}₽\nБаланс: ${balance}₽`);
         }
 
-        function showSettings() {
+        function showHistory() {
             closeMenu();
-            alert('⚙️ Настройки:\n\nЗвук: Вкл\nВибрация: Вкл\nАвтоставка: Выкл');
+            const fullHistory = document.getElementById('fullHistory');
+            fullHistory.innerHTML = history.map(item => 
+                `<div style="padding: 10px; background: rgba(0, 224, 255, 0.1); border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 14px; color: ${item.isWin ? '#00ff88' : '#ff4444'}">
+                            ${item.isWin ? '✓ Победа' : '✗ Проигрыш'}
+                        </div>
+                        <div style="font-size: 12px; color: #888;">${item.time}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 16px; font-weight: bold; color: ${item.isWin ? '#00ff88' : '#ff4444'}">
+                            ${item.isWin ? '+' : '-'}${item.amount}₽
+                        </div>
+                        <div style="font-size: 12px; color: #888;">${item.multiplier}x</div>
+                    </div>
+                </div>`
+            ).join('') || '<div style="text-align: center; color: #888; padding: 20px;">История пуста</div>';
+            document.getElementById('historyModal').classList.add('active');
+        }
+
+        function closeHistory() {
+            document.getElementById('historyModal').classList.remove('active');
         }
 
         function showSupport() {
             closeMenu();
-            alert('💬 Поддержка:\n\nТелеграм: @support\nEmail: support@crashx.com\n\nМы ответим в течение 24 часов!');
+            tg.showAlert('💬 Поддержка:\n\nТелеграм: @support\nEmail: support@crashx.com\n\nМы ответим в течение 24 часов!');
         }
 
         // Инициализация
         updateBalance();
-        updateHistoryDisplay();
+        updateMiniHistory();
     </script>
 </body>
 </html>
