@@ -955,7 +955,7 @@
                     </div>
                 </div>
                 
-                <button class="btn-start" id="btnStart" onclick="startGame()">
+                <button class="btn-start" id="btnStart" onclick="startGame()" disabled>
                     🎲 Сделать ставку
                 </button>
                 
@@ -982,7 +982,6 @@
     <script>
         console.log('🚀 Запуск приложения...');
 
-        // 🔥 ИНИЦИАЛИЗАЦИЯ FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyB2DeQ0_RWb_O8GGblt9UbOzTdoc-jVbmE",
             authDomain: "crashx-2fdb0.firebaseapp.com",
@@ -997,7 +996,6 @@
         const database = firebase.database();
         console.log('✅ Firebase инициализирован');
 
-        // 🎮 ГЕНЕРАЦИЯ ID ИГРОКА
         let playerId = localStorage.getItem('playerId');
         if (!playerId) {
             playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -1012,7 +1010,6 @@
         let playerName = tg.initDataUnsafe?.user?.first_name || 'Игрок' + Math.floor(Math.random() * 9999);
         console.log('👤 Имя игрока:', playerName);
 
-        // 🎮 ПЕРЕМЕННЫЕ
         let balance = 0;
         let currentMultiplier = 1.00;
         let isGameRunning = false;
@@ -1030,7 +1027,6 @@
 
         let currentRoundBets = [];
 
-        // Элементы
         const elBalance = document.getElementById('balance');
         const elMultiplier = document.getElementById('multiplier');
         const elStatus = document.getElementById('statusText');
@@ -1046,7 +1042,6 @@
         const elOnlineCount = document.getElementById('onlineCount');
         const elHostBadge = document.getElementById('hostBadge');
 
-        // 💳 МОДАЛЬНЫЕ ОКНА
         function getDepositModalBodyHtml() {
             return `
                 <div class="form-group">
@@ -1327,7 +1322,6 @@
             }
         });
 
-        // 🔥 РЕГИСТРАЦИЯ ИГРОКА
         async function registerPlayer() {
             console.log('📝 Регистрация игрока...');
             try {
@@ -1352,7 +1346,6 @@
             }
         }
 
-        // 🔥 СЛУШАЕМ ОНЛАЙН
         database.ref('players').on('value', (snapshot) => {
             const players = snapshot.val();
             const onlineCount = players ? Object.keys(players).length : 0;
@@ -1360,7 +1353,6 @@
             console.log('👥 Игроков онлайн:', onlineCount);
         });
 
-        // 👑 СИСТЕМА ХОСТА
         async function checkAndBecomeHost() {
             console.log('👑 Проверка хоста...');
             
@@ -1421,7 +1413,7 @@
             
             setTimeout(() => {
                 runGameRound();
-            }, 2000);
+            }, 1000);
         }
 
         async function runGameRound() {
@@ -1667,6 +1659,7 @@
         }
 
         function startCountdownFromServer(countdown) {
+            console.log('⏱ Отсчет:', countdown);
             isCountingDown = true;
             userPlacedBet = false;
             myBetId = null;
@@ -1688,6 +1681,7 @@
         }
 
         function startGameRoundFromServer(round) {
+            console.log('🚀 Раунд запущен!');
             isGameRunning = true;
             userCashedOut = false;
             currentMultiplier = 1.00;
@@ -1745,6 +1739,7 @@
         }
 
         function crashFromServer(crashMultiplier) {
+            console.log('💥 Краш на', crashMultiplier + 'x');
             clearInterval(gameInterval);
             isGameRunning = false;
             
@@ -1842,11 +1837,12 @@
             }, 3000);
         }
 
-        // 🚀 ЗАПУСК ПРИЛОЖЕНИЯ
         async function initApp() {
             console.log('🚀 Инициализация приложения...');
             
             initBalance();
+            
+            elStatus.innerText = "🔄 Подключение...";
             
             await registerPlayer();
             
@@ -1855,10 +1851,9 @@
             console.log('✅ Приложение готово!');
         }
 
-        // Запускаем после загрузки Firebase
         setTimeout(() => {
             initApp();
-        }, 1000);
+        }, 500);
 
         database.ref('.info/connected').on('value', (snapshot) => {
             if (snapshot.val() === true) {
