@@ -160,6 +160,41 @@
             color: #888;
         }
 
+        .balance-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .btn-balance {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-deposit {
+            background: linear-gradient(135deg, var(--success-color), #00cc70);
+            color: var(--black);
+        }
+
+        .btn-deposit:active {
+            transform: scale(0.95);
+        }
+
+        .btn-withdraw {
+            background: linear-gradient(135deg, var(--accent-color), #0099cc);
+            color: var(--black);
+        }
+
+        .btn-withdraw:active {
+            transform: scale(0.95);
+        }
+
         .main-container {
             width: 100%;
             max-width: 900px;
@@ -598,6 +633,135 @@
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
+
+        /* МОДАЛЬНОЕ ОКНО */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideInRight 0.3s;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #333;
+        }
+
+        .modal-header h2 {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--warning-color);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modal-input-group label {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .modal-input-group input {
+            padding: 12px;
+            font-size: 1rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), #00bfff);
+            color: var(--black);
+        }
+
+        .modal-btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        .modal-btn-secondary {
+            background: var(--secondary-bg);
+            color: var(--main-text);
+            border: 1px solid #333;
+        }
+
+        .modal-btn-secondary:active {
+            transform: scale(0.95);
+        }
+
+        .modal-info {
+            background: var(--secondary-bg);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #aaa;
+            border-left: 3px solid var(--accent-color);
+        }
     </style>
 </head>
 <body>
@@ -610,6 +774,14 @@
         <div class="balance-box">
             <div class="balance-main"><span id="balance">1000</span> ₽</div>
             <div class="balance-label">Ваш баланс</div>
+            <div class="balance-actions">
+                <button class="btn-balance btn-deposit" onclick="openDepositModal()">
+                    💳 Пополнить
+                </button>
+                <button class="btn-balance btn-withdraw" onclick="openWithdrawModal()">
+                    💰 Вывести
+                </button>
+            </div>
             <div class="online-counter">
                 <span class="online-dot"></span>
                 <span id="onlineCount">0</span> онлайн
@@ -664,6 +836,67 @@
                     <div class="empty-bets">
                         Подключение к серверу...
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ПОПОЛНЕНИЯ -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💳 Пополнение</h2>
+                <button class="modal-close" onclick="closeDepositModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-input-group">
+                    <label>Сумма пополнения (₽)</label>
+                    <input type="number" id="depositAmount" value="100" min="10" placeholder="100">
+                </div>
+                <div class="modal-info">
+                    💡 Минимальная сумма: 10 ₽<br>
+                    ⚡️ Зачисление мгновенное
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-secondary" onclick="closeDepositModal()">
+                        Отмена
+                    </button>
+                    <button class="modal-btn modal-btn-primary" onclick="processDeposit()">
+                        Пополнить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ВЫВОДА -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💰 Вывод средств</h2>
+                <button class="modal-close" onclick="closeWithdrawModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-input-group">
+                    <label>Сумма вывода (₽)</label>
+                    <input type="number" id="withdrawAmount" value="100" min="10" placeholder="100">
+                </div>
+                <div class="modal-input-group">
+                    <label>Номер карты</label>
+                    <input type="text" id="withdrawCard" placeholder="0000 0000 0000 0000" maxlength="19">
+                </div>
+                <div class="modal-info">
+                    💡 Минимальная сумма: 10 ₽<br>
+                    ⏱ Вывод в течение 24 часов<br>
+                    💳 Поддерживаются карты: Visa, MasterCard, МИР
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-secondary" onclick="closeWithdrawModal()">
+                        Отмена
+                    </button>
+                    <button class="modal-btn modal-btn-primary" onclick="processWithdraw()">
+                        Вывести
+                    </button>
                 </div>
             </div>
         </div>
@@ -733,6 +966,94 @@
         const elOnlineCount = document.getElementById('onlineCount');
         const elHostBadge = document.getElementById('hostBadge');
 
+        // 💳 МОДАЛЬНЫЕ ОКНА
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.add('show');
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.remove('show');
+        }
+
+        function openWithdrawModal() {
+            if (balance < 10) {
+                showNotification('❌ Минимальная сумма для вывода: 10 ₽', 'error');
+                return;
+            }
+            document.getElementById('withdrawModal').classList.add('show');
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').classList.remove('show');
+        }
+
+        function processDeposit() {
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            
+            if (isNaN(amount) || amount < 10) {
+                showNotification('❌ Минимальная сумма: 10 ₽', 'error');
+                return;
+            }
+
+            // Имитация пополнения (в реальности здесь будет платёжная система)
+            balance += amount;
+            updateBalanceUI();
+            
+            closeDepositModal();
+            showNotification(`✅ Баланс пополнен на ${amount} ₽`, 'success');
+        }
+
+        function processWithdraw() {
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            const card = document.getElementById('withdrawCard').value;
+            
+            if (isNaN(amount) || amount < 10) {
+                showNotification('❌ Минимальная сумма: 10 ₽', 'error');
+                return;
+            }
+
+            if (amount > balance) {
+                showNotification('❌ Недостаточно средств', 'error');
+                return;
+            }
+
+            if (!card || card.length < 16) {
+                showNotification('❌ Введите корректный номер карты', 'error');
+                return;
+            }
+
+            // Имитация вывода (в реальности здесь будет API платёжной системы)
+            balance -= amount;
+            updateBalanceUI();
+            
+            closeWithdrawModal();
+            showNotification(`✅ Заявка на вывод ${amount} ₽ принята`, 'success');
+            
+            // Очистка полей
+            document.getElementById('withdrawAmount').value = '100';
+            document.getElementById('withdrawCard').value = '';
+        }
+
+        // Закрытие модалок по клику вне окна
+        window.onclick = function(event) {
+            const depositModal = document.getElementById('depositModal');
+            const withdrawModal = document.getElementById('withdrawModal');
+            
+            if (event.target === depositModal) {
+                closeDepositModal();
+            }
+            if (event.target === withdrawModal) {
+                closeWithdrawModal();
+            }
+        }
+
+        // Форматирование номера карты
+        document.getElementById('withdrawCard').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+
         // 🔥 РЕГИСТРАЦИЯ ИГРОКА С ПРИОРИТЕТОМ
         const playerRef = database.ref('players/' + playerId);
         
@@ -768,20 +1089,16 @@
             const host = snapshot.val();
             
             if (!host || !host.playerId) {
-                // Нет хоста - пытаемся стать хостом
                 await tryBecomeHost();
             } else {
-                // Проверяем, жив ли хост
                 const hostPlayerRef = database.ref('players/' + host.playerId);
                 const hostPlayerSnapshot = await hostPlayerRef.once('value');
                 const hostPlayer = hostPlayerSnapshot.val();
                 
                 if (!hostPlayer || (Date.now() - hostPlayer.lastSeen > 30000)) {
-                    // Хост мёртв - становимся хостом
                     console.log('🔄 Хост неактивен, захватываем...');
                     await tryBecomeHost();
                 } else if (host.playerId === playerId) {
-                    // Мы хост
                     if (!isHost) {
                         isHost = true;
                         elHostBadge.classList.add('show');
@@ -790,7 +1107,6 @@
                         startHostLoop();
                     }
                 } else {
-                    // Кто-то другой хост
                     isHost = false;
                     elHostBadge.classList.remove('show');
                 }
@@ -799,14 +1115,12 @@
 
         async function tryBecomeHost() {
             try {
-                // Пытаемся установить себя хостом
                 await hostRef.set({
                     playerId: playerId,
                     playerName: playerName,
                     timestamp: Date.now()
                 });
                 
-                // Удаляем хоста при отключении
                 hostRef.onDisconnect().remove();
                 
                 isHost = true;
@@ -827,7 +1141,6 @@
             hostLoopRunning = true;
             console.log('🎮 Запуск игрового цикла...');
             
-            // Небольшая задержка перед первым раундом
             setTimeout(() => {
                 runGameRound();
             }, 2000);
@@ -846,7 +1159,6 @@
             console.log(`🎲 Новый раунд ${roundId}: краш на ${crashPoint}x через ${Math.round(crashTime)}ms`);
             
             try {
-                // ШАГ 1: ОБРАТНЫЙ ОТСЧЁТ (5 секунд)
                 await database.ref('currentRound').set({
                     id: roundId,
                     status: 'countdown',
@@ -855,14 +1167,12 @@
                     startTime: null
                 });
                 
-                // Обновляем обратный отсчёт каждую секунду
                 for (let countdown = 5; countdown > 0; countdown--) {
-                    if (!isHost) return; // Проверка на случай потери хоста
+                    if (!isHost) return;
                     await database.ref('currentRound/countdown').set(countdown);
                     await sleep(1000);
                 }
                 
-                // ШАГ 2: ЗАПУСК ИГРЫ
                 const gameStartTime = Date.now();
                 
                 await database.ref('currentRound').update({
@@ -873,12 +1183,10 @@
                 
                 console.log(`🚀 Раунд ${roundId} запущен`);
                 
-                // ШАГ 3: ЖДЁМ ДО КРАША
                 await sleep(crashTime);
                 
-                if (!isHost) return; // Проверка на случай потери хоста
+                if (!isHost) return;
                 
-                // ШАГ 4: КРАШ!
                 await database.ref('currentRound').update({
                     status: 'crashed',
                     endTime: Date.now()
@@ -886,7 +1194,6 @@
                 
                 console.log(`💥 Раунд ${roundId} крашнулся на ${crashPoint}x`);
                 
-                // ШАГ 5: ОБРАБАТЫВАЕМ ПРОИГРАВШИЕ СТАВКИ
                 const betsSnapshot = await database.ref('bets').once('value');
                 const bets = betsSnapshot.val();
                 
@@ -896,7 +1203,6 @@
                     Object.keys(bets).forEach(betId => {
                         const bet = bets[betId];
                         
-                        // Если ставка была в этом раунде и игрок не забрал
                         if (bet.roundId === roundId && bet.status === 'playing') {
                             updates[`bets/${betId}/status`] = 'crashed';
                             updates[`bets/${betId}/multiplier`] = crashPoint;
@@ -911,10 +1217,8 @@
                     }
                 }
                 
-                // ШАГ 6: ПАУЗА 3 СЕКУНДЫ ПЕРЕД СЛЕДУЮЩИМ РАУНДОМ
                 await sleep(3000);
                 
-                // ШАГ 7: ЗАПУСКАЕМ СЛЕДУЮЩИЙ РАУНД
                 if (isHost) {
                     runGameRound();
                 } else {
@@ -925,7 +1229,6 @@
                 console.error('❌ Ошибка в раунде:', error);
                 hostLoopRunning = false;
                 
-                // Пытаемся перезапустить через 5 секунд
                 if (isHost) {
                     setTimeout(() => {
                         startHostLoop();
@@ -934,43 +1237,33 @@
             }
         }
 
-        // 🎮 ФУНКЦИЯ ГЕНЕРАЦИИ КРАШ-ПОИНТА
         function generateCrashPoint() {
             const random = Math.random();
             let crashPoint;
             
             if (random < 0.1) {
-                // 10% шанс - очень ранний краш (1.01x - 1.50x)
                 crashPoint = 1.01 + Math.random() * 0.49;
             } else if (random < 0.3) {
-                // 20% шанс - ранний краш (1.50x - 2.50x)
                 crashPoint = 1.50 + Math.random() * 1.00;
             } else if (random < 0.6) {
-                // 30% шанс - средний краш (2.50x - 5.00x)
                 crashPoint = 2.50 + Math.random() * 2.50;
             } else if (random < 0.85) {
-                // 25% шанс - высокий краш (5.00x - 10.00x)
                 crashPoint = 5.00 + Math.random() * 5.00;
             } else {
-                // 15% шанс - очень высокий краш (10.00x - 100.00x)
                 crashPoint = 10.00 + Math.random() * 90.00;
             }
             
             return parseFloat(crashPoint.toFixed(2));
         }
 
-        // 🎮 ФУНКЦИЯ РАСЧЁТА ВРЕМЕНИ ДО КРАША
         function calculateCrashTime(crashPoint) {
             if (crashPoint <= 1.5) {
                 return (crashPoint - 1) / 0.15 * 1000;
-            } else if (crashPoint <= 3) {
-                return Math.pow((crashPoint - 1) / 0.08, 1/1.5) * 1000;
             } else {
                 return Math.pow((crashPoint - 1) / 0.08, 1/1.5) * 1000;
             }
         }
 
-        // 🛠️ ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ЗАДЕРЖКИ
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
@@ -1295,7 +1588,6 @@
             try {
                 const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
                 
-                // Очистка старых ставок
                 const betsSnapshot = await database.ref('bets').once('value');
                 const bets = betsSnapshot.val();
                 
@@ -1317,7 +1609,7 @@
             } catch (error) {
                 console.error('❌ Ошибка очистки:', error);
             }
-        }, 5 * 60 * 1000); // Каждые 5 минут
+        }, 5 * 60 * 1000);
     </script>
 </body>
 </html>
