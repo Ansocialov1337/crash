@@ -296,6 +296,25 @@
             animation: bounce 0.5s infinite;
         }
 
+        .host-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            z-index: 15;
+            display: none;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .host-badge.show {
+            display: block;
+        }
+
         .controls {
             padding: 12px;
             background: var(--card-bg);
@@ -601,6 +620,7 @@
     <div class="main-container">
         <div class="game-column">
             <div class="game-area" id="gameArea">
+                <div class="host-badge" id="hostBadge">👑 ВЫ ХОСТ</div>
                 <div class="multiplier-display active" id="multiplier">1.00x</div>
                 <div id="statusText">Подключение...</div>
                 <div class="countdown-timer" id="countdownTimer">5</div>
@@ -693,6 +713,7 @@
         let currentRoundId = null;
         let myBetId = null;
         let isHost = false;
+        let hostLoopRunning = false;
 
         let currentRoundBets = [];
 
@@ -710,20 +731,28 @@
         const elCountdownTimer = document.getElementById('countdownTimer');
         const elBetsContainer = document.getElementById('betsContainer');
         const elOnlineCount = document.getElementById('onlineCount');
+        const elHostBadge = document.getElementById('hostBadge');
 
-        // 🔥 РЕГИСТРАЦИЯ ИГРОКА
+        // 🔥 РЕГИСТРАЦИЯ ИГРОКА С ПРИОРИТЕТОМ
         const playerRef = database.ref('players/' + playerId);
-        playerRef.set({
-            name: playerName,
-            online: true,
-            lastSeen: Date.now()
-        });
+        
+        async function registerPlayer() {
+            await playerRef.set({
+                name: playerName,
+                online: true,
+                joinedAt: Date.now(),
+                lastSeen: Date.now()
+            });
+            
+            playerRef.onDisconnect().remove();
+            
+            // Обновляем lastSeen каждые 10 секунд
+            setInterval(() => {
+                playerRef.update({ lastSeen: Date.now() });
+            }, 10000);
+        }
 
-        playerRef.onDisconnect().remove();
-
-        setInterval(() => {
-            playerRef.update({ lastSeen: Date.now() });
-        }, 30000);
+        registerPlayer();
 
         // 🔥 СЛУШАЕМ ОНЛАЙН
         database.ref('players').on('value', (snapshot) => {
@@ -732,135 +761,216 @@
             elOnlineCount.textContent = onlineCount;
         });
 
-        // 🔥 СИСТЕМА ХОСТА (первый игрок становится хостом)
+        // 👑 СИСТЕМА ХОСТА - САМЫЙ ПЕРВЫЙ ИГРОК
         const hostRef = database.ref('gameHost');
         
-        hostRef.on('value', (snapshot) => {
+        hostRef.on('value', async (snapshot) => {
             const host = snapshot.val();
             
             if (!host || !host.playerId) {
-                // Нет хоста - становимся хостом
-                becomeHost();
-            } else if (host.playerId === playerId) {
-                // Мы хост
-                isHost = true;
-                console.log('🎮 Вы хост игры');
+                // Нет хоста - пытаемся стать хостом
+                await tryBecomeHost();
             } else {
-                // Кто-то другой хост
-                isHost = false;
+                // Проверяем, жив ли хост
+                const hostPlayerRef = database.ref('players/' + host.playerId);
+                const hostPlayerSnapshot = await hostPlayerRef.once('value');
+                const hostPlayer = hostPlayerSnapshot.val();
+                
+                if (!hostPlayer || (Date.now() - hostPlayer.lastSeen > 30000)) {
+                    // Хост мёртв - становимся хостом
+                    console.log('🔄 Хост неактивен, захватываем...');
+                    await tryBecomeHost();
+                } else if (host.playerId === playerId) {
+                    // Мы хост
+                    if (!isHost) {
+                        isHost = true;
+                        elHostBadge.classList.add('show');
+                        console.log('👑 Вы стали хостом!');
+                        showNotification('👑 Вы теперь хост игры!', 'success');
+                        startHostLoop();
+                    }
+                } else {
+                    // Кто-то другой хост
+                    isHost = false;
+                    elHostBadge.classList.remove('show');
+                }
             }
         });
 
-        function becomeHost() {
-            hostRef.set({
-                playerId: playerId,
-                playerName: playerName,
-                timestamp: Date.now()
-            }).then(() => {
+        async function tryBecomeHost() {
+            try {
+                // Пытаемся установить себя хостом
+                await hostRef.set({
+                    playerId: playerId,
+                    playerName: playerName,
+                    timestamp: Date.now()
+                });
+                
+                // Удаляем хоста при отключении
+                hostRef.onDisconnect().remove();
+                
                 isHost = true;
+                elHostBadge.classList.add('show');
                 console.log('👑 Вы стали хостом!');
+                showNotification('👑 Вы теперь хост игры!', 'success');
+                
                 startHostLoop();
-            });
-            
-            hostRef.onDisconnect().remove();
+            } catch (error) {
+                console.error('❌ Ошибка при попытке стать хостом:', error);
+            }
         }
 
         // 🎮 ХОСТ ЗАПУСКАЕТ РАУНДЫ
         function startHostLoop() {
-            if (!isHost) return;
+            if (!isHost || hostLoopRunning) return;
             
+            hostLoopRunning = true;
+            console.log('🎮 Запуск игрового цикла...');
+            
+            // Небольшая задержка перед первым раундом
             setTimeout(() => {
                 runGameRound();
             }, 2000);
         }
 
         async function runGameRound() {
-            if (!isHost) return;
+            if (!isHost) {
+                hostLoopRunning = false;
+                return;
+            }
             
             const roundId = Date.now();
             const crashPoint = generateCrashPoint();
             const crashTime = calculateCrashTime(crashPoint);
             
-            console.log(`🎲 Новый раунд: краш на ${crashPoint}x`);
+            console.log(`🎲 Новый раунд ${roundId}: краш на ${crashPoint}x через ${Math.round(crashTime)}ms`);
             
-            // ОБРАТНЫЙ ОТСЧЁТ
-            await database.ref('currentRound').set({
-                id: roundId,
-                status: 'countdown',
-                countdown: 5,
-                crashPoint: crashPoint
-            });
-            
-            for (let countdown = 5; countdown > 0; countdown--) {
-                await database.ref('currentRound/countdown').set(countdown);
-                await sleep(1000);
-            }
-            
-            // ЗАПУСК ИГРЫ
-            await database.ref('currentRound').update({
-                status: 'running',
-                startTime: Date.now()
-            });
-            
-            // ЖДЁМ КРАША
-            await sleep(crashTime);
-            
-            // КРАШ
-            await database.ref('currentRound').update({
-                status: 'crashed'
-            });
-            
-            // ОБРАБОТКА ПРОИГРАВШИХ СТАВОК
-            const betsSnapshot = await database.ref('bets').once('value');
-            const bets = betsSnapshot.val();
-            
-            if (bets) {
-                const updates = {};
-                
-                Object.keys(bets).forEach(betId => {
-                    const bet = bets[betId];
-                    
-                    if (bet.roundId === roundId && bet.status === 'playing') {
-                        updates[`bets/${betId}/status`] = 'crashed';
-                        updates[`bets/${betId}/multiplier`] = crashPoint;
-                        updates[`bets/${betId}/profit`] = -bet.betAmount;
-                    }
+            try {
+                // ШАГ 1: ОБРАТНЫЙ ОТСЧЁТ (5 секунд)
+                await database.ref('currentRound').set({
+                    id: roundId,
+                    status: 'countdown',
+                    countdown: 5,
+                    crashPoint: crashPoint,
+                    startTime: null
                 });
                 
-                if (Object.keys(updates).length > 0) {
-                    await database.ref().update(updates);
+                // Обновляем обратный отсчёт каждую секунду
+                for (let countdown = 5; countdown > 0; countdown--) {
+                    if (!isHost) return; // Проверка на случай потери хоста
+                    await database.ref('currentRound/countdown').set(countdown);
+                    await sleep(1000);
                 }
-            }
-            
-            // ПАУЗА И СЛЕДУЮЩИЙ РАУНД
-            await sleep(3000);
-            
-            if (isHost) {
-                runGameRound();
+                
+                // ШАГ 2: ЗАПУСК ИГРЫ
+                const gameStartTime = Date.now();
+                
+                await database.ref('currentRound').update({
+                    status: 'running',
+                    startTime: gameStartTime,
+                    countdown: 0
+                });
+                
+                console.log(`🚀 Раунд ${roundId} запущен`);
+                
+                // ШАГ 3: ЖДЁМ ДО КРАША
+                await sleep(crashTime);
+                
+                if (!isHost) return; // Проверка на случай потери хоста
+                
+                // ШАГ 4: КРАШ!
+                await database.ref('currentRound').update({
+                    status: 'crashed',
+                    endTime: Date.now()
+                });
+                
+                console.log(`💥 Раунд ${roundId} крашнулся на ${crashPoint}x`);
+                
+                // ШАГ 5: ОБРАБАТЫВАЕМ ПРОИГРАВШИЕ СТАВКИ
+                const betsSnapshot = await database.ref('bets').once('value');
+                const bets = betsSnapshot.val();
+                
+                if (bets) {
+                    const updates = {};
+                    
+                    Object.keys(bets).forEach(betId => {
+                        const bet = bets[betId];
+                        
+                        // Если ставка была в этом раунде и игрок не забрал
+                        if (bet.roundId === roundId && bet.status === 'playing') {
+                            updates[`bets/${betId}/status`] = 'crashed';
+                            updates[`bets/${betId}/multiplier`] = crashPoint;
+                            updates[`bets/${betId}/profit`] = -bet.betAmount;
+                            
+                            console.log(`❌ Игрок ${bet.playerName} проиграл ${bet.betAmount} ₽`);
+                        }
+                    });
+                    
+                    if (Object.keys(updates).length > 0) {
+                        await database.ref().update(updates);
+                    }
+                }
+                
+                // ШАГ 6: ПАУЗА 3 СЕКУНДЫ ПЕРЕД СЛЕДУЮЩИМ РАУНДОМ
+                await sleep(3000);
+                
+                // ШАГ 7: ЗАПУСКАЕМ СЛЕДУЮЩИЙ РАУНД
+                if (isHost) {
+                    runGameRound();
+                } else {
+                    hostLoopRunning = false;
+                }
+                
+            } catch (error) {
+                console.error('❌ Ошибка в раунде:', error);
+                hostLoopRunning = false;
+                
+                // Пытаемся перезапустить через 5 секунд
+                if (isHost) {
+                    setTimeout(() => {
+                        startHostLoop();
+                    }, 5000);
+                }
             }
         }
 
+        // 🎮 ФУНКЦИЯ ГЕНЕРАЦИИ КРАШ-ПОИНТА
         function generateCrashPoint() {
             const random = Math.random();
             let crashPoint;
             
-            if (random < 0.1) crashPoint = 1.01 + Math.random() * 0.49;
-            else if (random < 0.3) crashPoint = 1.50 + Math.random() * 1.00;
-            else if (random < 0.6) crashPoint = 2.50 + Math.random() * 2.50;
-            else if (random < 0.85) crashPoint = 5.00 + Math.random() * 5.00;
-            else crashPoint = 10.00 + Math.random() * 90.00;
+            if (random < 0.1) {
+                // 10% шанс - очень ранний краш (1.01x - 1.50x)
+                crashPoint = 1.01 + Math.random() * 0.49;
+            } else if (random < 0.3) {
+                // 20% шанс - ранний краш (1.50x - 2.50x)
+                crashPoint = 1.50 + Math.random() * 1.00;
+            } else if (random < 0.6) {
+                // 30% шанс - средний краш (2.50x - 5.00x)
+                crashPoint = 2.50 + Math.random() * 2.50;
+            } else if (random < 0.85) {
+                // 25% шанс - высокий краш (5.00x - 10.00x)
+                crashPoint = 5.00 + Math.random() * 5.00;
+            } else {
+                // 15% шанс - очень высокий краш (10.00x - 100.00x)
+                crashPoint = 10.00 + Math.random() * 90.00;
+            }
             
             return parseFloat(crashPoint.toFixed(2));
         }
 
+        // 🎮 ФУНКЦИЯ РАСЧЁТА ВРЕМЕНИ ДО КРАША
         function calculateCrashTime(crashPoint) {
             if (crashPoint <= 1.5) {
                 return (crashPoint - 1) / 0.15 * 1000;
+            } else if (crashPoint <= 3) {
+                return Math.pow((crashPoint - 1) / 0.08, 1/1.5) * 1000;
             } else {
                 return Math.pow((crashPoint - 1) / 0.08, 1/1.5) * 1000;
             }
         }
 
+        // 🛠️ ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ЗАДЕРЖКИ
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
@@ -1177,6 +1287,37 @@
                 showNotification('❌ Нет подключения', 'error');
             }
         });
+
+        // 🧹 ОЧИСТКА СТАРЫХ ДАННЫХ (только для хоста)
+        setInterval(async () => {
+            if (!isHost) return;
+            
+            try {
+                const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+                
+                // Очистка старых ставок
+                const betsSnapshot = await database.ref('bets').once('value');
+                const bets = betsSnapshot.val();
+                
+                if (bets) {
+                    const updates = {};
+                    
+                    Object.keys(bets).forEach(betId => {
+                        const bet = bets[betId];
+                        if (bet.timestamp < fiveMinutesAgo) {
+                            updates[`bets/${betId}`] = null;
+                        }
+                    });
+                    
+                    if (Object.keys(updates).length > 0) {
+                        await database.ref().update(updates);
+                        console.log(`🧹 Удалено ${Object.keys(updates).length} старых ставок`);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Ошибка очистки:', error);
+            }
+        }, 5 * 60 * 1000); // Каждые 5 минут
     </script>
 </body>
 </html>
